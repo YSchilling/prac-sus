@@ -19,7 +19,7 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # Your group's fixed tag: the groupname column and label in CONTRACT.md.
-GROUP = "example"
+GROUP = "Group B"
 IDLE_W, MAX_W = 50.0, 150.0
 SPLIT = {"package": 0.85, "dram": 0.15}
 
