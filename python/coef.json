@@ -1,0 +1,18 @@
+{
+  "package": {
+    "intercept": 6.561616,
+    "weights": {
+      "ratio": 39.525889,
+      "ratio_over_half": -19.943182,
+      "ghz": 12.065579
+    }
+  },
+  "dram": {
+    "intercept": -1.030036,
+    "weights": {
+      "ratio": 1.097748,
+      "ratio_over_half": -3.645125,
+      "ghz": 3.801914
+    }
+  }
+}

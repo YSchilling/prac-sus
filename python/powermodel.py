@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Baseline node power from Prometheus, split over pods. Stdlib only.
+"""Linear-regression node power from Prometheus, split over pods. Stdlib only.
 
     python3 powermodel.py --mode offline --node sut-02 --range "$(cat <snapshot>/span.txt)"
     python3 powermodel.py --node sut-02       # online: /metrics on :9270
 
 Every flag can also be set as POWERMODEL_<FLAG>, e.g. POWERMODEL_CPU_MODEL.
-The model is predict(); the rest reads counters and writes CONTRACT.md's shapes.
+The model is features() + predict(), with coefficients from coef.json (train.py);
+the rest reads counters and writes CONTRACT.md's shapes.
 """
 import argparse
 import csv
@@ -20,8 +21,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # Your group's fixed tag: the groupname column and label in CONTRACT.md.
 GROUP = "Group B"
-IDLE_W, MAX_W = 50.0, 150.0
-SPLIT = {"package": 0.85, "dram": 0.15}
+# Per zone: watts = intercept + sum(weight x feature). Written by train.py.
+COEF_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coef.json")
 
 
 def query_range(prom, selector, start, end, step):
@@ -49,7 +50,9 @@ def fetch(a, start, end):
                       start, end, a.step)
     pods = query_range(a.prometheus, f'container_cpu_usage_seconds_total{{pod!="",container!="",node="{a.node}"}}',
                        start, end, a.step)
-    return cpu, pods
+    freq = query_range(a.prometheus, f'node_cpu_scaling_frequency_hertz{{node="{a.node}"}}',
+                       start, end, a.step)
+    return cpu, pods, freq
 
 
 def counter_delta(now, prev):
@@ -78,25 +81,48 @@ def pod_cpu(now, prev):
     return out
 
 
-def predict(ratio, pods, busy_seconds):
-    """Kepler's split: active = node x ratio; pod = active x pod_cpu / node_cpu."""
-    node_w = IDLE_W + (MAX_W - IDLE_W) * ratio
+def mean_ghz(samples):
+    """Mean scaling frequency over all cores, in GHz, or None without samples."""
+    return sum(samples.values()) / len(samples) / 1e9 if samples else None
+
+
+def features(ratio, ghz):
+    """The regression inputs. train.py fits on exactly these.
+
+    ratio_over_half: past half the logical cores, hyperthread siblings share
+    a physical core and each extra unit of load adds less power.
+    """
+    return {"ratio": ratio, "ratio_over_half": max(ratio - 0.5, 0.0), "ghz": ghz}
+
+
+def load_coef(path=COEF_FILE):
+    with open(path) as f:
+        return json.load(f)
+
+
+def predict(coef, x, pods, busy_seconds):
+    """Linear model per zone; Kepler's split: active = node x ratio,
+    pod = active x pod_cpu / node_cpu."""
     rows = {}
-    for zone, frac in SPLIT.items():
-        node, active = node_w * frac, node_w * frac * ratio
-        share = {p: active * min(c / busy_seconds, 1.0) if busy_seconds > 0 else 0.0
-                 for p, c in pods.items()}
+    for zone, c in coef.items():
+        node = max(c["intercept"] + sum(w * x[f] for f, w in c["weights"].items()), 0.0)
+        active = node * x["ratio"]
+        share = {p: active * min(s / busy_seconds, 1.0) if busy_seconds > 0 else 0.0
+                 for p, s in pods.items()}
         rows[zone] = (node, active, share)
     return rows
 
 
-def at(cpu, pods, ts, step):
+def at(coef, cpu, pods, freq, ts, step):
     """{zone: (node_w, active_w, {pod: w})} at ts, or None on a gap."""
     now, prev = cpu.get(ts, {}), cpu.get(ts - step, {})
-    if not now or not prev:
+    # Frequency is a gauge: the previous sample will do if this one is missing.
+    ghz = mean_ghz(freq.get(ts) or freq.get(ts - step) or {})
+    if not now or not prev or ghz is None:
         return None
     per_pod = pod_cpu(pods.get(ts, {}), pods.get(ts - step, {}))
-    return predict(usage_ratio(now, prev, step), per_pod, counter_delta(now, prev))
+    x = features(usage_ratio(now, prev, step), ghz)
+    return predict(coef, x, per_pod, counter_delta(now, prev))
 
 
 def offline(a):
@@ -104,7 +130,8 @@ def offline(a):
         sys.exit("--mode offline needs --range")
     start, end = (int(datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp())
                   for s in a.range.split(".."))
-    cpu, pods = fetch(a, start, end)
+    coef = load_coef()
+    cpu, pods, freq = fetch(a, start, end)
     if not cpu:
         sys.exit(f"no node_cpu_seconds_total for node={a.node!r} in {a.range}: "
                  "wrong node name, or outside the snapshot's span?")
@@ -115,7 +142,7 @@ def offline(a):
         n = 0
         # The first step only provides the previous sample (CONTRACT.md).
         for ts in range(start + a.step, end + 1, a.step):
-            rows = at(cpu, pods, ts, a.step)
+            rows = at(coef, cpu, pods, freq, ts, a.step)
             if rows is None:
                 continue  # a gap: no row, and the scorer counts the miss
             for zone, (node, active, share) in rows.items():
@@ -138,6 +165,8 @@ def metrics(a, rows):
 
 
 def online(a):
+    coef = load_coef()
+
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
             if self.path != "/metrics":
@@ -146,12 +175,12 @@ def online(a):
             # /proc reader would hold in memory, nothing older.
             ts = int(time.time()) // a.step * a.step
             try:
-                rows = at(*fetch(a, ts - a.step, ts), ts, a.step)
+                rows = at(coef, *fetch(a, ts - a.step, ts), ts, a.step)
             except (OSError, RuntimeError) as e:
                 return self.send_error(503, str(e))
             if rows is None:
                 # Zero watts would be a number pretending to be an estimate.
-                return self.send_error(503, f"no node_cpu_seconds_total for node={a.node!r} at {ts}")
+                return self.send_error(503, f"no CPU or frequency samples for node={a.node!r} at {ts}")
             body = metrics(a, rows).encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; version=0.0.4")
