@@ -1,18 +1,15 @@
 {
   "package": {
-    "intercept": 6.561616,
+    "intercept": 22.842057,
     "weights": {
-      "ratio": 39.525889,
-      "ratio_over_half": -19.943182,
-      "ghz": 12.065579
+      "user_ratio": 45.812934,
+      "kernel_ratio": 73.699268
     }
   },
   "dram": {
-    "intercept": -1.030036,
+    "intercept": 4.053056,
     "weights": {
-      "ratio": 1.097748,
-      "ratio_over_half": -3.645125,
-      "ghz": 3.801914
+      "ratio": 4.140415
     }
   }
 }

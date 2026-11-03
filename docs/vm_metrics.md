@@ -50,9 +50,9 @@ any VM.
 | `node_nvme_info`, `node_disk_ata_rotation_rate_rpm`, `node_disk_ata_write_cache`, `node_disk_ata_write_cache_enabled`, `node_disk_device_mapper_info`, `node_disk_filesystem_info` | virtual disks |
 | `node_infiniband_info`, `node_infiniband_physical_state_id`, `node_infiniband_rate_bytes_per_second`, `node_infiniband_state_id` | no InfiniBand NIC |
 
-`python/powermodel.py` currently needs `node_cpu_scaling_frequency_hertz`. In
-a VM, online mode answers every scrape with 503. Frequency has to become
-optional or be dropped.
+`python/powermodel.py` uses only CPU execution counters: user/nice and
+system/irq/softirq. It no longer needs frequency, so missing cpufreq metrics
+do not prevent VM predictions.
 
 ### Missing because the clusters are configured differently
 
@@ -128,9 +128,9 @@ budgets, not consumption. Don't use it.
   through `kube_pod_info{pod=~"process-exporter-.*"}`.
 - **Topology looks different.** In the VM,
   `machine_cpu_cores == machine_cpu_physical_cores` (8 = 8): the guest cannot
-  see SMT. The "usage above one half" feature in `features()` assumes 2 threads
-  per core, which is true on the Xeon but has no meaning in the VM. Derive it
-  from the two metrics instead of hard-coding it.
+  see SMT. The model therefore has no fixed "usage above one half" feature or
+  dependence on guest-reported physical cores. CPU fractions are normalized
+  by the number of logical CPUs in the execution counters.
 - **Node metrics cover the whole VM.** They include everything the guest
   kernel runs, not just pods. In kind, that also means the control-plane
   container and any other Docker containers on the VM.

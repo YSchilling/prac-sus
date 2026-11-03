@@ -44,20 +44,20 @@ def rows(snapshot, prom, node, step):
     span = open(os.path.join(snapshot, "span.txt")).read().strip()
     start, end = (int(datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp())
                   for s in span.split(".."))
-    cpu, _, freq = pm.fetch(SimpleNamespace(prometheus=prom, node=node, step=step), start, end)
+    cpu, _ = pm.fetch(SimpleNamespace(prometheus=prom, node=node, step=step), start, end)
     y = truth(os.path.join(snapshot, "truth.csv"), node)
     out = []
     for ts in range(start + step, end + 1, step):
         now, prev = cpu.get(ts, {}), cpu.get(ts - step, {})
-        ghz = pm.mean_ghz(freq.get(ts) or freq.get(ts - step) or {})
+        x = pm.features(now, prev, step)
         labels = {z: y[(ts, z)] for z in ZONES if (ts, z) in y}
-        if now and prev and ghz is not None and len(labels) == len(ZONES):
-            out.append((pm.features(pm.usage_ratio(now, prev, step), ghz), labels))
+        if x is not None and len(labels) == len(ZONES):
+            out.append((x, labels))
     return out
 
 
 def matrix(data, zone):
-    names = list(data[0][0])
+    names = pm.ZONE_FEATURES[zone]
     return names, np.array([[x[n] for n in names] for x, _ in data]), np.array([y[zone] for _, y in data])
 
 
@@ -88,7 +88,7 @@ def main():
                 for (s, node), rs in sorted(data.items()):
                     if s == held and rs:
                         _, Xt, Yt = matrix(rs, zone)
-                        print(f"  {zone:<8} {s}/{node:<8} {np.mean(np.abs(m.predict(Xt) - Yt)):7.3f}")
+                        print(f"  {zone:<8} {s}/{node:<8} {np.mean(np.abs(np.maximum(m.predict(Xt), 0.0) - Yt)):7.3f}")
 
     everything = [r for rs in data.values() for r in rs]
     coef = {}
