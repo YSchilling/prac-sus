@@ -11,6 +11,7 @@ the rest reads counters and writes CONTRACT.md's shapes.
 import argparse
 import csv
 import json
+import math
 import os
 import sys
 import time
@@ -22,6 +23,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 # Your group's fixed tag: the groupname column and label in CONTRACT.md.
 GROUP = "Group B"
 # Per zone: watts = intercept + sum(weight x feature). Written by train.py.
+ZONE_FEATURES = {"package": ("user_ratio", "kernel_ratio"), "dram": ("ratio",)}
+CPU_MODES = {"user", "nice", "system", "irq", "softirq"}
 COEF_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coef.json")
 
 
@@ -46,27 +49,17 @@ def query_range(prom, selector, start, end, step):
 
 def fetch(a, start, end):
     """Node and pod CPU counters on the step grid from start to end."""
-    cpu = query_range(a.prometheus, f'node_cpu_seconds_total{{mode!="idle",node="{a.node}"}}',
+    cpu = query_range(a.prometheus, f'node_cpu_seconds_total{{mode=~"user|nice|system|irq|softirq",node="{a.node}"}}',
                       start, end, a.step)
     pods = query_range(a.prometheus, f'container_cpu_usage_seconds_total{{pod!="",container!="",node="{a.node}"}}',
                        start, end, a.step)
-    freq = query_range(a.prometheus, f'node_cpu_scaling_frequency_hertz{{node="{a.node}"}}',
-                       start, end, a.step)
-    return cpu, pods, freq
+    return cpu, pods
 
 
 def counter_delta(now, prev):
     """Per-series counter deltas, summed. A negative delta is a counter reset
     and counts as zero; a series without a previous sample is skipped."""
     return sum(max(v - prev[k], 0.0) for k, v in now.items() if k in prev)
-
-
-def usage_ratio(now, prev, step):
-    """Non-idle fraction of all cores over the step, 0..1."""
-    cores = len({json.loads(k)["cpu"] for k in now})
-    if cores == 0:
-        return 0.0
-    return min(counter_delta(now, prev) / (cores * step), 1.0)
 
 
 def pod_cpu(now, prev):
@@ -81,18 +74,33 @@ def pod_cpu(now, prev):
     return out
 
 
-def mean_ghz(samples):
-    """Mean scaling frequency over all cores, in GHz, or None without samples."""
-    return sum(samples.values()) / len(samples) / 1e9 if samples else None
+def features(now, prev, step):
+    """Executed CPU fractions, shared by training and inference.
 
-
-def features(ratio, ghz):
-    """The regression inputs. train.py fits on exactly these.
-
-    ratio_over_half: past half the logical cores, hyperthread siblings share
-    a physical core and each extra unit of load adds less power.
+    Only user/nice and system/IRQ time count as execution. No frequency or
+    physical-core topology is needed. Reject incomplete/reset CPU windows.
     """
-    return {"ratio": ratio, "ratio_over_half": max(ratio - 0.5, 0.0), "ghz": ghz}
+    now = {k: v for k, v in now.items() if json.loads(k)["mode"] in CPU_MODES}
+    prev = {k: v for k, v in prev.items() if json.loads(k)["mode"] in CPU_MODES}
+    if not now or now.keys() != prev.keys():
+        return None
+    modes = {}
+    user = kernel = 0.0
+    for k, value in now.items():
+        lab = json.loads(k)
+        modes.setdefault(lab["cpu"], set()).add(lab["mode"])
+        if not math.isfinite(value) or not math.isfinite(prev[k]) or value < prev[k]:
+            return None
+        if lab["mode"] in {"user", "nice"}:
+            user += value - prev[k]
+        else:
+            kernel += value - prev[k]
+    if any(m != CPU_MODES for m in modes.values()):
+        return None
+    # Scrape jitter can make a delta slightly exceed the nominal window.
+    capacity = max(len(modes) * step, user + kernel)
+    return {"user_ratio": user / capacity, "kernel_ratio": kernel / capacity,
+            "ratio": (user + kernel) / capacity}
 
 
 def load_coef(path=COEF_FILE):
@@ -113,15 +121,13 @@ def predict(coef, x, pods, busy_seconds):
     return rows
 
 
-def at(coef, cpu, pods, freq, ts, step):
+def at(coef, cpu, pods, ts, step):
     """{zone: (node_w, active_w, {pod: w})} at ts, or None on a gap."""
     now, prev = cpu.get(ts, {}), cpu.get(ts - step, {})
-    # Frequency is a gauge: the previous sample will do if this one is missing.
-    ghz = mean_ghz(freq.get(ts) or freq.get(ts - step) or {})
-    if not now or not prev or ghz is None:
+    x = features(now, prev, step)
+    if x is None:
         return None
     per_pod = pod_cpu(pods.get(ts, {}), pods.get(ts - step, {}))
-    x = features(usage_ratio(now, prev, step), ghz)
     return predict(coef, x, per_pod, counter_delta(now, prev))
 
 
@@ -131,7 +137,7 @@ def offline(a):
     start, end = (int(datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp())
                   for s in a.range.split(".."))
     coef = load_coef()
-    cpu, pods, freq = fetch(a, start, end)
+    cpu, pods = fetch(a, start, end)
     if not cpu:
         sys.exit(f"no node_cpu_seconds_total for node={a.node!r} in {a.range}: "
                  "wrong node name, or outside the snapshot's span?")
@@ -142,7 +148,7 @@ def offline(a):
         n = 0
         # The first step only provides the previous sample (CONTRACT.md).
         for ts in range(start + a.step, end + 1, a.step):
-            rows = at(coef, cpu, pods, freq, ts, a.step)
+            rows = at(coef, cpu, pods, ts, a.step)
             if rows is None:
                 continue  # a gap: no row, and the scorer counts the miss
             for zone, (node, active, share) in rows.items():
@@ -180,7 +186,7 @@ def online(a):
                 return self.send_error(503, str(e))
             if rows is None:
                 # Zero watts would be a number pretending to be an estimate.
-                return self.send_error(503, f"no CPU or frequency samples for node={a.node!r} at {ts}")
+                return self.send_error(503, f"missing, incomplete or reset CPU samples for node={a.node!r} at {ts}")
             body = metrics(a, rows).encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; version=0.0.4")
