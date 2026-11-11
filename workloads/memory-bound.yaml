@@ -1,0 +1,67 @@
+# Memory-bound workload on the measured SUT (sut-01/02: 20 hardware threads).
+#
+#   1. idle                              90 s
+#   2. levels 0/25/50/75/100 %           8 busy threads, of which 0/2/4/6/8 stream
+#                                        through memory and the rest stay in cache,
+#                                        120 s each
+#   3. footprint                         16 GiB allocated and touched once, then
+#                                        held without access, 120 s
+#   4. bandwidth ramp                    8 memrate workers capped at 125 .. 8000 MB/s
+#                                        each (1 .. 64 GB/s in total), 30 s each
+#   5. idle                              90 s
+#
+# The levels keep CPU busy share fixed (8/20 threads) so that DRAM power can only
+# change with memory traffic. The footprint step checks that memory held but not
+# accessed costs little, since "memory used" is a VM-visible feature candidate.
+# The ramp gives known bandwidths to fit DRAM power against.
+# About 20 minutes.
+#
+#   kubectl apply -f workloads/memory-bound.yaml
+#   kubectl logs -f job/memory-bound
+#
+# Each step prints a UTC timestamp so the run can be matched to Prometheus.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: memory-bound
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: memory-bound
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        role: sut
+      containers:
+        - name: stress-ng
+          image: debian:trixie-slim
+          env:
+            - name: DEBIAN_FRONTEND
+              value: noninteractive
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              apt-get update -qq && apt-get install -y -qq --no-install-recommends stress-ng >/dev/null
+              mark() { echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*"; }
+              mark "idle start"; sleep 90
+              for mem in 0 2 4 6 8; do
+                # A worker count of 0 means "one per CPU" in stress-ng, so leave
+                # a stressor out entirely instead of passing 0.
+                args=()
+                [ "$mem" -gt 0 ] && args+=(--stream "$mem")
+                [ "$mem" -lt 8 ] && args+=(--cpu $((8 - mem)))
+                mark "level=$((mem * 100 / 8)) stream=$mem cpu=$((8 - mem)) start"
+                stress-ng "${args[@]}" --timeout 120s --metrics-brief
+              done
+              mark "footprint start"
+              stress-ng --vm 1 --vm-bytes 16G --vm-hang 0 --timeout 120s
+              for mbs in 125 250 500 1000 2000 4000 8000; do
+                mark "ramp=${mbs}MB/s/worker start"
+                stress-ng --memrate 8 --memrate-bytes 512M \
+                  --memrate-rd-mbs "$mbs" --memrate-wr-mbs "$mbs" --timeout 30s --metrics-brief
+              done
+              mark "idle start"; sleep 90
+              mark "done"

@@ -1,0 +1,55 @@
+# CPU-bound workload on the measured SUT (sut-01/02: 20 hardware threads).
+#
+#   1. idle                              90 s
+#   2. levels 25/50/75/100 %             5/10/15/20 threads at full load, 120 s each
+#   3. idle                              60 s
+#   4. ramp 10 -> 100 -> 10 %            all 20 threads, duty cycle in 10 % steps, 15 s each
+#   5. idle                              90 s
+#
+# The levels pack the load onto whole threads; the ramp spreads the same busy
+# share over every thread, so the two parts differ in hyperthread use.
+# stress-ng --cpu stays in cache, so this barely touches DRAM (see memory-bound.yaml).
+# About 20 minutes.
+#
+#   kubectl apply -f workloads/cpu-bound.yaml
+#   kubectl logs -f job/cpu-bound
+#
+# Each step prints a UTC timestamp so the run can be matched to Prometheus.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cpu-bound
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: cpu-bound
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        role: sut
+      containers:
+        - name: stress-ng
+          image: debian:trixie-slim
+          env:
+            - name: DEBIAN_FRONTEND
+              value: noninteractive
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              apt-get update -qq && apt-get install -y -qq --no-install-recommends stress-ng >/dev/null
+              mark() { echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*"; }
+              mark "idle start"; sleep 90
+              for pct in 25 50 75 100; do
+                mark "level=$pct start"
+                stress-ng --cpu $((20 * pct / 100)) --timeout 120s --metrics-brief
+              done
+              mark "idle start"; sleep 60
+              for load in 10 20 30 40 50 60 70 80 90 100 90 80 70 60 50 40 30 20 10; do
+                mark "ramp=$load start"
+                stress-ng --cpu 20 --cpu-load "$load" --timeout 15s
+              done
+              mark "idle start"; sleep 90
+              mark "done"
