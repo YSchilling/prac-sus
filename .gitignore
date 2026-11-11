@@ -1,2 +1,7 @@
 tools/.prometheus
-__pycache__/
+__pycache__/snapshots/*/tsdb/lock
+snapshots/*/tsdb/wal/
+snapshots/*/tsdb/chunks_head/
+snapshots/*/tsdb/lock
+snapshots/*/tsdb/wal/
+snapshots/*/tsdb/chunks_head/
