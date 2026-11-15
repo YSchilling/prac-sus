@@ -6,6 +6,11 @@ Our own CPU- and memory-bound workloads, measured with RAPL on the real SUTs
 the lab Prometheus with [`tools/lab_export.py`](../../tools/lab_export.py),
 so it cannot be served with `tools/prom.sh` or scored with `tools/score.py`.
 
+**Follow-up:** [`lab-1115`](../lab-1115/README.md) repeats both workloads 4 times on
+sut-01, includes an in-cluster Prometheus snapshot with PSI/vmstat counters,
+and answers the open problem below (no VM-visible node counter tracks memory
+bandwidth).
+
 | File | Content |
 | --- | --- |
 | `trace-sut-01.csv`, `trace-sut-02.csv` | 5 s grid: RAPL `pkg_w`, `dram_w` (ground truth) plus VM-visible inputs (CPU ratios by mode, memory, context switches, disk, network, frequency) |
