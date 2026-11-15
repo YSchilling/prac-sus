@@ -1,5 +1,9 @@
 tools/.prometheus
-__pycache__/snapshots/*/tsdb/lock
+__pycache__/
+.venv/
+
+# Prometheus rewrites these whenever tools/prom.sh serves a snapshot
+snapshots/*/tsdb/lock
+snapshots/*/tsdb/queries.active
 snapshots/*/tsdb/wal/
 snapshots/*/tsdb/chunks_head/
-
