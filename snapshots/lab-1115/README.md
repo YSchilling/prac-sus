@@ -14,10 +14,13 @@ first single runs and the reasoning behind the workloads.
 | `windows.csv`, `phases.csv` | 164 phase windows (from the job logs, via [`tools/lab_windows.py`](../../tools/lab_windows.py)) and the trace averaged over each |
 | `stream-bandwidth.csv` | memory bandwidth the `stream` workers actually achieved per memory level, read from the job logs |
 | `logs/` | `runs.log` (Job start/end times) and each Job's log with UTC step marks |
+| `truth.csv`, `span.txt`, `hw.env` | Kepler node and pod watts on a 10 s grid, the window, and the hardware, as in the course snapshots |
 
-Runs are named `<job>/r<round>` in the CSVs. The snapshot has no
-`truth.csv`/`span.txt` yet, so `tools/score.py` cannot use it directly.
-Its node labels are `node="sut-01"` (in-cluster) vs. `instance="sut-01"`
+Runs are named `<job>/r<round>` in the CSVs. `truth.csv`, `span.txt` and
+`hw.env` follow the course snapshots' format (made with
+[`tools/make_truth.py`](../../tools/make_truth.py) from the Kepler series in
+`tsdb/`), so `train.py`, `powermodel.py --mode offline` and `tools/score.py`
+work on it like on `stress-1008`. Its node labels are `node="sut-01"` (in-cluster) vs. `instance="sut-01"`
 (lab Prometheus). Kepler's `kepler_node_cpu_watts` in the snapshot reads RAPL
 directly, so it is ground truth and must not be a model input.
 
