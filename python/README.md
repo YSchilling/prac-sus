@@ -145,7 +145,7 @@ after changing it.
 | split | snapshots |
 | --- | --- |
 | train | [`lab-1115`](../snapshots/lab-1115/README.md) (cpu + memory, 4 rounds), [`lab-1116-io`](../snapshots/lab-1116-io/README.md) (io run 1) |
-| test | [`lab-1116`](../snapshots/lab-1116/README.md) (cpu + memory), [`lab-1116-io2`](../snapshots/lab-1116-io2/) (io run 2) |
+| test | [`lab-1116`](../snapshots/lab-1116/README.md) (cpu + memory), [`lab-1116-io2`](../snapshots/lab-1116-io2/) (io run 2), [`lab-1116-sut02`](../snapshots/lab-1116-sut02/README.md) (sut-02, all four workloads incl. mixed) |
 
 Node power MAE on the test runs, `tools/score.py`:
 
@@ -161,6 +161,14 @@ DRAM's ratio term only fit the training data. Held-out workloads stay hard:
 about 9 W package / 5 W DRAM on memory-bound (memory traffic is invisible to
 CPU time), and above 20 W when cpu-bound is missing from training (the other
 workloads never exceed 41 % CPU, so the fit extrapolates).
+
+On sut-02, which it never trained on
+([`lab-1116-sut02`](../snapshots/lab-1116-sut02/README.md)), it does about as
+well as on sut-01 (round 2: cpu 3.3 / 1.8 W, memory 6.8 / 4.7 W, io 2.3 /
+1.4 W), and on the unseen mixed workload it scores 8.5–8.8 W package /
+5.9–6.0 W DRAM (`coef.json`: 15.6–15.8 / 7.7 W). Its misses are the phases
+with memory streaming. A refit that adds sut-02 gained at most 0.4 W, so
+one model serves both nodes in the default profile.
 
 Keep `coef.json` for the course snapshots: they look like a different CPU
 configuration (sut-02 idles at 33 W and never sleeps, like the lab's

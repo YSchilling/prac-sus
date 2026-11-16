@@ -1,0 +1,19 @@
+2026-11-16T17:18:15Z start rounds=2 jobs=prac-sus/workloads/cpu-bound.yaml prac-sus/workloads/memory-bound.yaml prac-sus/workloads/io-bound.yaml prac-sus/workloads/mixed.yaml node=cp-02
+2026-11-16T17:18:15Z round=1 job=cpu-bound apply
+2026-11-16T17:35:22Z round=1 job=cpu-bound complete
+2026-11-16T17:36:22Z round=1 job=memory-bound apply
+2026-11-16T17:55:09Z round=1 job=memory-bound complete
+2026-11-16T17:56:09Z round=1 job=io-bound apply
+2026-11-16T18:11:35Z round=1 job=io-bound complete
+2026-11-16T18:12:36Z round=1 job=mixed apply
+2026-11-16T18:33:08Z round=1 job=mixed complete
+2026-11-16T18:34:08Z round=2 job=cpu-bound apply
+2026-11-16T18:51:13Z round=2 job=cpu-bound complete
+2026-11-16T18:52:13Z round=2 job=memory-bound apply
+2026-11-16T19:11:01Z round=2 job=memory-bound complete
+2026-11-16T19:12:01Z round=2 job=io-bound apply
+2026-11-16T19:27:27Z round=2 job=io-bound complete
+2026-11-16T19:28:28Z round=2 job=mixed apply
+2026-11-16T19:49:00Z round=2 job=mixed complete
+2026-11-16T19:50:04Z captured in-cluster Prometheus snapshot 20261116T195000Z-097b53d30e4eb36f
+2026-11-16T19:50:04Z done
