@@ -1,0 +1,150 @@
+# Mixed CPU, memory and disk workload on the measured SUT (20 hardware threads).
+#
+#   prepare: fully write and flush a 4 GiB file, outside measured phases
+#   idle                 90 s
+#   cpu-memory          180 s   4 CPU + 4 streaming workers
+#   cpu-io              180 s   4 CPU + fio, queue depth 8
+#   memory-io           180 s   4 streaming + fio, queue depth 8
+#   all                 180 s   4 CPU + 4 streaming + fio, queue depth 8
+#   all-high            180 s   8 CPU + 8 streaming + fio, queue depth 32
+#   idle                 90 s
+# Four 30 s cooldowns separate the load phases: about 20 minutes plus setup
+# and final write flushes. All fio phases use one worker, random 4 KiB I/O,
+# 70% reads / 30% writes, direct I/O and a fixed random seed.
+#
+# Worker counts and queue depths are generator settings, not measured load.
+# Inspect achieved CPU busy, STREAM bandwidth and fio IOPS/bandwidth/latency.
+# RAPL measures package/DRAM, not the disk itself. Initially keep this run
+# out of training to test generalization from the isolated workloads.
+#
+# Disk-backed emptyDir on the SUT's kubelet storage; requires ext4/XFS and
+# >=6 GiB free. Check the logged source against SUT topology to confirm local
+# storage (ext4/XFS can also sit on remote block storage). No raw-device writes.
+# direct=1 bypasses the OS page cache, not device caches. File removed on exit;
+# deleting the Job releases the volume. Run separately from the other Jobs.
+#
+#   kubectl apply -f workloads/mixed.yaml
+#   kubectl logs -f job/mixed
+#
+# UTC markers work with tools/lab_windows.py and tools/lab_repeat.sh.
+# Preparation is unmarked; cooldowns are separate from the idle baselines.
+# Load windows include process startup and final flushes. Capture the full
+# Prometheus snapshot with node_disk_*, CPU system/iowait and memory counters.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mixed
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 2100
+  template:
+    metadata:
+      labels:
+        app: mixed
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        role: sut
+      volumes:
+        - name: scratch
+          emptyDir:
+            sizeLimit: 6Gi
+      containers:
+        - name: mixed
+          image: debian:trixie-slim
+          env:
+            - name: DEBIAN_FRONTEND
+              value: noninteractive
+          resources:
+            requests:
+              ephemeral-storage: 6Gi
+            limits:
+              ephemeral-storage: 8Gi
+          volumeMounts:
+            - name: scratch
+              mountPath: /scratch
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              apt-get update -qq && apt-get install -y -qq --no-install-recommends stress-ng fio util-linux >/dev/null
+              mark() { echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*"; }
+              echo "Storage backing /scratch:"
+              findmnt -T /scratch -o TARGET,SOURCE,FSTYPE,OPTIONS
+              fstype=$(findmnt -n -T /scratch -o FSTYPE)
+              case "$fstype" in
+                ext4|xfs) ;;
+                *) echo "Expected disk-backed ext4/XFS, got $fstype; check the SUT storage." >&2; exit 1 ;;
+              esac
+              available=$(df -B1 --output=avail /scratch | tail -n 1)
+              if (( available < 6 * 1024 * 1024 * 1024 )); then
+                echo "Need at least 6 GiB free on /scratch." >&2
+                exit 1
+              fi
+              file=/scratch/mixed.dat
+              pids=()
+              cleanup() {
+                # Each tracked PID leads a private session/process group.
+                # Stop its workers too, not just the fio/stress-ng parent.
+                for pid in "${pids[@]}"; do
+                  kill -TERM -- "-$pid" 2>/dev/null || true
+                  kill -KILL -- "-$pid" 2>/dev/null || true
+                done
+                for pid in "${pids[@]}"; do wait "$pid" 2>/dev/null || true; done
+                rm -f -- "$file"
+              }
+              trap cleanup EXIT
+              trap 'exit 143' TERM
+              trap 'exit 130' INT
+              wait_workers() {
+                local finished rc pid
+                local remaining=()
+                while (( ${#pids[@]} )); do
+                  if wait -n -p finished "${pids[@]}"; then
+                    remaining=()
+                    for pid in "${pids[@]}"; do
+                      if [[ "$pid" != "$finished" ]]; then remaining+=("$pid"); fi
+                    done
+                    pids=("${remaining[@]}")
+                  else
+                    rc=$?
+                    echo "Worker failed (exit $rc); aborting mixed workload." >&2
+                    exit "$rc"
+                  fi
+                done
+              }
+              common=(--filename="$file" --size=4G --ioengine=libaio --direct=1
+                      --numjobs=1 --group_reporting --exitall_on_error)
+              echo "Preparing 4 GiB test file before measurement"
+              setsid fio --name=prepare "${common[@]}" --rw=write --bs=1M --iodepth=32 --end_fsync=1 &
+              pids=("$!")
+              wait_workers
+              mark "idle start"; sleep 90
+              phase() {
+                local name=$1 cpu=$2 mem=$3 depth=$4
+                local stress_args=()
+                # stress-ng treats zero workers as 'one per CPU': omit them.
+                if (( cpu > 0 )); then stress_args+=(--cpu "$cpu"); fi
+                if (( mem > 0 )); then stress_args+=(--stream "$mem"); fi
+                mark "$name cpu=$cpu stream=$mem depth=$depth start"
+                setsid stress-ng "${stress_args[@]}" --timeout 180s --metrics-brief &
+                pids=("$!")
+                if (( depth > 0 )); then
+                  setsid fio --name="$name" "${common[@]}" --allow_file_create=0 \
+                    --rw=randrw --rwmixread=70 --bs=4k --iodepth="$depth" \
+                    --time_based --runtime=180s --end_fsync=1 --randseed=42 &
+                  pids+=("$!")
+                fi
+                wait_workers
+              }
+              phase cpu-memory 4 4 0
+              mark "cooldown start"; sleep 30
+              phase cpu-io 4 0 8
+              mark "cooldown start"; sleep 30
+              phase memory-io 0 4 8
+              mark "cooldown start"; sleep 30
+              phase all 4 4 8
+              mark "cooldown start"; sleep 30
+              phase all-high 8 8 32
+              mark "idle start"; sleep 90
+              mark "done"
