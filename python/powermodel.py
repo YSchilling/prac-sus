@@ -6,7 +6,9 @@
 
 Every flag can also be set as POWERMODEL_<FLAG>, e.g. POWERMODEL_CPU_MODEL.
 The model is features() + predict(), with coefficients from coef.json (train.py);
-the rest reads counters and writes CONTRACT.md's shapes.
+the rest reads counters and writes CONTRACT.md's shapes. --coef picks another
+coefficient file, e.g. coef-default-profile.json for SUTs booked with the
+lab's default CPU tuning.
 """
 import argparse
 import csv
@@ -23,8 +25,18 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 # Your group's fixed tag: the groupname column and label in CONTRACT.md.
 GROUP = "Group B"
 # Per zone: watts = intercept + sum(weight x feature). Written by train.py.
-ZONE_FEATURES = {"package": ("user_ratio", "kernel_ratio"), "dram": ("ratio",)}
+# Package uses the total ratio, not user_ratio/kernel_ratio: our lab workloads
+# hardly touch the kernel (kernel_ratio < 0.03), so its weight fits noise
+# (-953 on lab-1115). Split it again once a training set has real kernel load.
+# coef.json predates this and still uses the split; predict() reads whatever
+# features a coefficient file names.
+ZONE_FEATURES = {"package": ("ratio", "awake"), "dram": ("ratio", "awake")}
 CPU_MODES = {"user", "nice", "system", "irq", "softirq"}
+# CPU ratio at which "awake" is 63 % of the way from 0 to 1. Power steps up
+# as soon as anything runs (cores leave deep sleep, DRAM leaves self-refresh)
+# and then flattens: lab-1115 DRAM is 0.9 W idle and 5.6 W from about 20 %
+# busy on, whatever the load.
+AWAKE_SCALE = 0.05
 COEF_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coef.json")
 
 
@@ -99,8 +111,9 @@ def features(now, prev, step):
         return None
     # Scrape jitter can make a delta slightly exceed the nominal window.
     capacity = max(len(modes) * step, user + kernel)
+    ratio = (user + kernel) / capacity
     return {"user_ratio": user / capacity, "kernel_ratio": kernel / capacity,
-            "ratio": (user + kernel) / capacity}
+            "ratio": ratio, "awake": 1 - math.exp(-ratio / AWAKE_SCALE)}
 
 
 def load_coef(path=COEF_FILE):
@@ -136,7 +149,7 @@ def offline(a):
         sys.exit("--mode offline needs --range")
     start, end = (int(datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp())
                   for s in a.range.split(".."))
-    coef = load_coef()
+    coef = load_coef(a.coef)
     cpu, pods = fetch(a, start, end)
     if not cpu:
         sys.exit(f"no node_cpu_seconds_total for node={a.node!r} in {a.range}: "
@@ -171,7 +184,7 @@ def metrics(a, rows):
 
 
 def online(a):
-    coef = load_coef()
+    coef = load_coef(a.coef)
 
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -216,6 +229,7 @@ def main():
     ap.add_argument("--range", default=env("range"), help="RFC3339..RFC3339, offline only")
     # This example's extras.
     ap.add_argument("--out", default=env("out", "predictions.csv"))
+    ap.add_argument("--coef", default=env("coef", COEF_FILE), help="coefficient file from train.py")
     ap.add_argument("--listen", default=env("listen", ":9270"))
     a = ap.parse_args()
     if not a.node:

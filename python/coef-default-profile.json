@@ -1,0 +1,16 @@
+{
+  "package": {
+    "intercept": 8.153987,
+    "weights": {
+      "ratio": 34.044349,
+      "awake": 31.326868
+    }
+  },
+  "dram": {
+    "intercept": -1.828491,
+    "weights": {
+      "ratio": -4.840283,
+      "awake": 13.071498
+    }
+  }
+}
