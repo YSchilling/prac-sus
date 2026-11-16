@@ -42,8 +42,8 @@ class CPUModelTests(unittest.TestCase):
         awake = lambda busy: pm.features(samples(user=busy * 10), samples(), 10)["awake"]
         self.assertEqual(awake(0), 0)
         self.assertAlmostEqual(awake(pm.AWAKE_SCALE), 1 - math.exp(-1))
-        self.assertGreater(awake(0.2), 0.98)
-        self.assertLess(awake(1) - awake(0.5), 1e-4)
+        self.assertGreater(awake(5 * pm.AWAKE_SCALE), 0.99)
+        self.assertLess(awake(1) - awake(0.5), 0.01)
 
     def test_every_zone_feature_is_computed(self):
         x = pm.features(samples(user=1), samples(), 10)

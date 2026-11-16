@@ -107,8 +107,9 @@ On bare metal, set the two hardware values in
 
 ## Flags
 
-The flags from `CONTRACT.md`, plus `--listen` (online, default `:9270`) and
-`--out` (offline, default `predictions.csv`). Each can also be set as
+The flags from `CONTRACT.md`, plus `--listen` (online, default `:9270`),
+`--out` (offline, default `predictions.csv`) and `--coef` (coefficient file,
+default `coef.json`). Each can also be set as
 `POWERMODEL_<FLAG>`.
 
 ## Verification
@@ -122,6 +123,48 @@ coefficients on both snapshots and both nodes (`sut-01,sut-02` by default).
 Hardware flags are metadata; they do not calibrate coefficients to a different
 CPU. Successful VM inference verifies availability and output, not physical
 power accuracy: the VM's synthetic power is not a validation target.
+
+## Default-profile model (2026-11-16)
+
+`coef-default-profile.json` is fitted on our own lab runs with the default CPU
+tuning on sut-01, and selected with `--coef python/coef-default-profile.json`
+or `POWERMODEL_COEF`. `features()` adds `awake`, a curve that rises fast and
+then flattens, because power jumps as soon as anything runs (deep sleep and
+DRAM self-refresh end) and then levels off:
+
+```text
+r     = executed CPU seconds / (CPUs x step)            (= ratio)
+awake = 1 - exp(-r / 0.1)                               (AWAKE_SCALE)
+package = max(0, 11.028829 + 25.251207 * r + 34.283384 * awake)
+dram    = max(0,  0.310309 +  8.952979 * awake)
+```
+
+A coefficient file only fits the `AWAKE_SCALE` it was trained with; retrain
+after changing it.
+
+| split | snapshots |
+| --- | --- |
+| train | [`lab-1115`](../snapshots/lab-1115/README.md) (cpu + memory, 4 rounds), [`lab-1116-io`](../snapshots/lab-1116-io/README.md) (io run 1) |
+| test | [`lab-1116`](../snapshots/lab-1116/README.md) (cpu + memory), [`lab-1116-io2`](../snapshots/lab-1116-io2/) (io run 2) |
+
+Node power MAE on the test runs, `tools/score.py`:
+
+| test run | `coef.json` package / DRAM | `coef-default-profile.json` package / DRAM |
+| --- | --- | --- |
+| lab-1116 | 11.03 / 3.67 | **5.22 / 3.18** |
+| lab-1116-io2 | 4.42 / 1.55 | **2.20 / 0.91** |
+
+The features were chosen by leaving one workload out (train on two of
+cpu/memory/io-bound, test on the third; see `lab-1116-io`): scale 0.1 beat
+0.05 and 0.2, a user/kernel split made every held-out workload worse, and
+DRAM's ratio term only fit the training data. Held-out workloads stay hard:
+about 9 W package / 5 W DRAM on memory-bound (memory traffic is invisible to
+CPU time), and above 20 W when cpu-bound is missing from training (the other
+workloads never exceed 41 % CPU, so the fit extrapolates).
+
+Keep `coef.json` for the course snapshots: they look like a different CPU
+configuration (sut-02 idles at 33 W and never sleeps, like the lab's
+clean-room profile), and there the default-profile fit is worse.
 
 ## Current trained baseline (2026-11-03)
 

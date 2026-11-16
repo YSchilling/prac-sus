@@ -25,18 +25,20 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 # Your group's fixed tag: the groupname column and label in CONTRACT.md.
 GROUP = "Group B"
 # Per zone: watts = intercept + sum(weight x feature). Written by train.py.
-# Package uses the total ratio, not user_ratio/kernel_ratio: our lab workloads
-# hardly touch the kernel (kernel_ratio < 0.03), so its weight fits noise
-# (-953 on lab-1115). Split it again once a training set has real kernel load.
+# Chosen by leaving one lab workload out (cpu/memory/io-bound, see
+# snapshots/lab-1116-io): package uses the total ratio, because a user/kernel
+# split made every held-out workload worse (kernel time stays under 5 %);
+# DRAM uses awake alone, because its ratio term only fit the training data.
 # coef.json predates this and still uses the split; predict() reads whatever
 # features a coefficient file names.
-ZONE_FEATURES = {"package": ("ratio", "awake"), "dram": ("ratio", "awake")}
+ZONE_FEATURES = {"package": ("ratio", "awake"), "dram": ("awake",)}
 CPU_MODES = {"user", "nice", "system", "irq", "softirq"}
 # CPU ratio at which "awake" is 63 % of the way from 0 to 1. Power steps up
 # as soon as anything runs (cores leave deep sleep, DRAM leaves self-refresh)
 # and then flattens: lab-1115 DRAM is 0.9 W idle and 5.6 W from about 20 %
-# busy on, whatever the load.
-AWAKE_SCALE = 0.05
+# busy on, whatever the load. 0.1 beat 0.05 and 0.2 on held-out workloads
+# (0.05 overshot the 2-6 % CPU of io-bound).
+AWAKE_SCALE = 0.1
 COEF_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coef.json")
 
 
