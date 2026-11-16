@@ -1,0 +1,7 @@
+2026-11-16T15:29:16Z start rounds=1 jobs=prac-sus/workloads/cpu-bound.yaml prac-sus/workloads/memory-bound.yaml node=cp-01
+2026-11-16T15:29:16Z round=1 job=cpu-bound apply
+2026-11-16T15:46:23Z round=1 job=cpu-bound complete
+2026-11-16T15:47:23Z round=1 job=memory-bound apply
+2026-11-16T16:06:10Z round=1 job=memory-bound complete
+2026-11-16T16:07:13Z captured in-cluster Prometheus snapshot 20261116T160711Z-53d27152a6cd5fa3
+2026-11-16T16:07:13Z done

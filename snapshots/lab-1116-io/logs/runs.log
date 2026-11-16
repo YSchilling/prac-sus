@@ -1,0 +1,5 @@
+2026-11-16T16:11:18Z start rounds=1 jobs=prac-sus/workloads/io-bound.yaml node=cp-01
+2026-11-16T16:11:19Z round=1 job=io-bound apply
+2026-11-16T16:26:44Z round=1 job=io-bound complete
+2026-11-16T16:27:47Z captured in-cluster Prometheus snapshot 20261116T162745Z-481447565cd500f7
+2026-11-16T16:27:47Z done

@@ -1,0 +1,207 @@
+2026-11-16T15:47:37Z idle start
+2026-11-16T15:49:07Z level=0 stream=0 cpu=8 start
+stress-ng: info:  [533] setting to a 2 mins run per stressor
+stress-ng: info:  [533] dispatching hogs: 8 cpu
+stress-ng: info:  [533] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: metrc: [533] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [533]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [533] cpu             1136477    120.00    959.95      0.04      9470.65        1183.85
+stress-ng: info:  [533] skipped: 0
+stress-ng: info:  [533] passed: 8: cpu (8)
+stress-ng: info:  [533] failed: 0
+stress-ng: info:  [533] metrics untrustworthy: 0
+stress-ng: info:  [533] successful run completed in 2 mins
+2026-11-16T15:51:07Z level=25 stream=2 cpu=6 start
+stress-ng: info:  [543] setting to a 2 mins run per stressor
+stress-ng: info:  [543] dispatching hogs: 2 stream, 6 cpu
+stress-ng: info:  [543] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [544] stream: stressor loosely based on a variant of the STREAM benchmark code
+stress-ng: info:  [544] stream: do NOT submit any of these results to the STREAM benchmark results
+stress-ng: info:  [544] stream: Using cache size of 14080K
+stress-ng: info:  [544] stream: memory rate: 8553.78 MB read/sec, 5702.52 MB write/sec, 747.44 double precision Mflop/sec (instance 0)
+stress-ng: info:  [545] stream: memory rate: 8973.86 MB read/sec, 5982.57 MB write/sec, 784.15 double precision Mflop/sec (instance 1)
+stress-ng: metrc: [543] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [543]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [543] stream            12673    120.01    239.99      0.04       105.60          52.80
+stress-ng: metrc: [543] cpu              851240    120.00    719.95      0.04      7093.67        1182.29
+stress-ng: info:  [543] skipped: 0
+stress-ng: info:  [543] passed: 8: stream (2) cpu (6)
+stress-ng: info:  [543] failed: 0
+stress-ng: info:  [543] metrics untrustworthy: 0
+stress-ng: info:  [543] successful run completed in 2 mins
+2026-11-16T15:53:07Z level=50 stream=4 cpu=4 start
+stress-ng: info:  [553] setting to a 2 mins run per stressor
+stress-ng: info:  [553] dispatching hogs: 4 stream, 4 cpu
+stress-ng: info:  [553] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [554] stream: stressor loosely based on a variant of the STREAM benchmark code
+stress-ng: info:  [554] stream: do NOT submit any of these results to the STREAM benchmark results
+stress-ng: info:  [554] stream: Using cache size of 14080K
+stress-ng: info:  [554] stream: memory rate: 7714.81 MB read/sec, 5143.20 MB write/sec, 674.13 double precision Mflop/sec (instance 0)
+stress-ng: info:  [557] stream: memory rate: 7888.29 MB read/sec, 5258.86 MB write/sec, 689.29 double precision Mflop/sec (instance 3)
+stress-ng: info:  [556] stream: memory rate: 7888.97 MB read/sec, 5259.31 MB write/sec, 689.35 double precision Mflop/sec (instance 2)
+stress-ng: info:  [555] stream: memory rate: 7879.97 MB read/sec, 5253.32 MB write/sec, 688.56 double precision Mflop/sec (instance 1)
+stress-ng: metrc: [553] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [553]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [553] stream            45356    120.01    479.95      0.07       377.95          94.49
+stress-ng: metrc: [553] cpu              568123    120.00    480.00      0.00      4734.31        1183.58
+stress-ng: info:  [553] skipped: 0
+stress-ng: info:  [553] passed: 8: stream (4) cpu (4)
+stress-ng: info:  [553] failed: 0
+stress-ng: info:  [553] metrics untrustworthy: 0
+stress-ng: info:  [553] successful run completed in 2 mins
+2026-11-16T15:55:07Z level=75 stream=6 cpu=2 start
+stress-ng: info:  [563] setting to a 2 mins run per stressor
+stress-ng: info:  [563] dispatching hogs: 6 stream, 2 cpu
+stress-ng: info:  [563] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [564] stream: stressor loosely based on a variant of the STREAM benchmark code
+stress-ng: info:  [564] stream: do NOT submit any of these results to the STREAM benchmark results
+stress-ng: info:  [564] stream: Using cache size of 14080K
+stress-ng: info:  [565] stream: memory rate: 6500.19 MB read/sec, 4333.46 MB write/sec, 568.00 double precision Mflop/sec (instance 1)
+stress-ng: info:  [569] stream: memory rate: 6482.78 MB read/sec, 4321.85 MB write/sec, 566.47 double precision Mflop/sec (instance 5)
+stress-ng: info:  [566] stream: memory rate: 6409.80 MB read/sec, 4273.20 MB write/sec, 560.10 double precision Mflop/sec (instance 2)
+stress-ng: info:  [564] stream: memory rate: 6485.25 MB read/sec, 4323.50 MB write/sec, 566.69 double precision Mflop/sec (instance 0)
+stress-ng: info:  [567] stream: memory rate: 6376.27 MB read/sec, 4250.85 MB write/sec, 557.17 double precision Mflop/sec (instance 3)
+stress-ng: info:  [568] stream: memory rate: 6439.63 MB read/sec, 4293.09 MB write/sec, 562.70 double precision Mflop/sec (instance 4)
+stress-ng: metrc: [563] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [563]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [563] stream            83922    120.00    719.92      0.10       699.33         116.56
+stress-ng: metrc: [563] cpu              281521    120.00    239.99      0.01      2345.96        1172.99
+stress-ng: info:  [563] skipped: 0
+stress-ng: info:  [563] passed: 8: stream (6) cpu (2)
+stress-ng: info:  [563] failed: 0
+stress-ng: info:  [563] metrics untrustworthy: 0
+stress-ng: info:  [563] successful run completed in 2 mins
+2026-11-16T15:57:07Z level=100 stream=8 cpu=0 start
+stress-ng: info:  [573] setting to a 2 mins run per stressor
+stress-ng: info:  [573] dispatching hogs: 8 stream
+stress-ng: info:  [573] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [574] stream: stressor loosely based on a variant of the STREAM benchmark code
+stress-ng: info:  [574] stream: do NOT submit any of these results to the STREAM benchmark results
+stress-ng: info:  [574] stream: Using cache size of 14080K
+stress-ng: info:  [575] stream: memory rate: 5169.39 MB read/sec, 3446.26 MB write/sec, 451.71 double precision Mflop/sec (instance 1)
+stress-ng: info:  [574] stream: memory rate: 5178.53 MB read/sec, 3452.36 MB write/sec, 452.51 double precision Mflop/sec (instance 0)
+stress-ng: info:  [581] stream: memory rate: 5155.86 MB read/sec, 3437.24 MB write/sec, 450.53 double precision Mflop/sec (instance 7)
+stress-ng: info:  [580] stream: memory rate: 5189.93 MB read/sec, 3459.95 MB write/sec, 453.50 double precision Mflop/sec (instance 6)
+stress-ng: info:  [579] stream: memory rate: 5158.36 MB read/sec, 3438.90 MB write/sec, 450.74 double precision Mflop/sec (instance 5)
+stress-ng: info:  [578] stream: memory rate: 5159.88 MB read/sec, 3439.92 MB write/sec, 450.88 double precision Mflop/sec (instance 4)
+stress-ng: info:  [577] stream: memory rate: 5145.21 MB read/sec, 3430.14 MB write/sec, 449.60 double precision Mflop/sec (instance 3)
+stress-ng: info:  [576] stream: memory rate: 5174.90 MB read/sec, 3449.93 MB write/sec, 452.19 double precision Mflop/sec (instance 2)
+stress-ng: metrc: [573] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [573]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [573] stream           119548    120.00    959.86      0.14       996.21         124.53
+stress-ng: info:  [573] skipped: 0
+stress-ng: info:  [573] passed: 8: stream (8)
+stress-ng: info:  [573] failed: 0
+stress-ng: info:  [573] metrics untrustworthy: 0
+stress-ng: info:  [573] successful run completed in 2 mins
+2026-11-16T15:59:07Z footprint start
+stress-ng: info:  [583] setting to a 2 mins run per stressor
+stress-ng: info:  [583] dispatching hogs: 1 vm
+stress-ng: info:  [584] vm: using 16G per stressor instance (total 16G of 39.77G available memory)
+stress-ng: info:  [583] skipped: 0
+stress-ng: info:  [583] passed: 1: vm (1)
+stress-ng: info:  [583] failed: 0
+stress-ng: info:  [583] metrics untrustworthy: 0
+stress-ng: info:  [583] successful run completed in 2 mins
+2026-11-16T16:01:08Z ramp=125MB/s/worker start
+stress-ng: info:  [587] setting to a 30 secs run per stressor
+stress-ng: info:  [587] dispatching hogs: 8 memrate
+stress-ng: info:  [587] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [588] memrate: using 512M per stressor instance (total 512M of 39.77G available memory)
+stress-ng: info:  [588] memrate: cache flushing disabled, cache flushing can be enabled with --memrate-flush option
+stress-ng: warn:  [587] metrics-check: all bogo-op counters are zero, data may be incorrect
+stress-ng: metrc: [587] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [587]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [587] memrate               0     30.00      9.47      1.80         0.00           0.00
+stress-ng: info:  [587] skipped: 0
+stress-ng: info:  [587] passed: 8: memrate (8)
+stress-ng: info:  [587] failed: 0
+stress-ng: info:  [587] metrics untrustworthy: 0
+stress-ng: info:  [587] successful run completed in 30.01 secs
+2026-11-16T16:01:38Z ramp=250MB/s/worker start
+stress-ng: info:  [605] setting to a 30 secs run per stressor
+stress-ng: info:  [605] dispatching hogs: 8 memrate
+stress-ng: info:  [605] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [606] memrate: using 512M per stressor instance (total 512M of 39.77G available memory)
+stress-ng: info:  [606] memrate: cache flushing disabled, cache flushing can be enabled with --memrate-flush option
+stress-ng: warn:  [605] metrics-check: all bogo-op counters are zero, data may be incorrect
+stress-ng: metrc: [605] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [605]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [605] memrate               0     30.01     13.28      1.47         0.00           0.00
+stress-ng: info:  [605] skipped: 0
+stress-ng: info:  [605] passed: 8: memrate (8)
+stress-ng: info:  [605] failed: 0
+stress-ng: info:  [605] metrics untrustworthy: 0
+stress-ng: info:  [605] successful run completed in 30.01 secs
+2026-11-16T16:02:08Z ramp=500MB/s/worker start
+stress-ng: info:  [623] setting to a 30 secs run per stressor
+stress-ng: info:  [623] dispatching hogs: 8 memrate
+stress-ng: info:  [623] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [624] memrate: using 512M per stressor instance (total 512M of 39.78G available memory)
+stress-ng: info:  [624] memrate: cache flushing disabled, cache flushing can be enabled with --memrate-flush option
+stress-ng: metrc: [623] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [623]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [623] memrate               8     30.01     24.91      1.89         0.27           0.30
+stress-ng: info:  [623] skipped: 0
+stress-ng: info:  [623] passed: 8: memrate (8)
+stress-ng: info:  [623] failed: 0
+stress-ng: info:  [623] metrics untrustworthy: 0
+stress-ng: info:  [623] successful run completed in 30.02 secs
+2026-11-16T16:02:38Z ramp=1000MB/s/worker start
+stress-ng: info:  [641] setting to a 30 secs run per stressor
+stress-ng: info:  [641] dispatching hogs: 8 memrate
+stress-ng: info:  [641] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [642] memrate: using 512M per stressor instance (total 512M of 39.77G available memory)
+stress-ng: info:  [642] memrate: cache flushing disabled, cache flushing can be enabled with --memrate-flush option
+stress-ng: metrc: [641] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [641]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [641] memrate              16     30.01     46.24      1.65         0.53           0.33
+stress-ng: info:  [641] skipped: 0
+stress-ng: info:  [641] passed: 8: memrate (8)
+stress-ng: info:  [641] failed: 0
+stress-ng: info:  [641] metrics untrustworthy: 0
+stress-ng: info:  [641] successful run completed in 30.02 secs
+2026-11-16T16:03:08Z ramp=2000MB/s/worker start
+stress-ng: info:  [659] setting to a 30 secs run per stressor
+stress-ng: info:  [659] dispatching hogs: 8 memrate
+stress-ng: info:  [659] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [660] memrate: using 512M per stressor instance (total 512M of 39.76G available memory)
+stress-ng: info:  [660] memrate: cache flushing disabled, cache flushing can be enabled with --memrate-flush option
+stress-ng: metrc: [659] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [659]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [659] memrate              32     30.00     79.33      2.24         1.07           0.39
+stress-ng: info:  [659] skipped: 0
+stress-ng: info:  [659] passed: 8: memrate (8)
+stress-ng: info:  [659] failed: 0
+stress-ng: info:  [659] metrics untrustworthy: 0
+stress-ng: info:  [659] successful run completed in 30.01 secs
+2026-11-16T16:03:38Z ramp=4000MB/s/worker start
+stress-ng: info:  [677] setting to a 30 secs run per stressor
+stress-ng: info:  [677] dispatching hogs: 8 memrate
+stress-ng: info:  [677] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [678] memrate: using 512M per stressor instance (total 512M of 39.76G available memory)
+stress-ng: info:  [678] memrate: cache flushing disabled, cache flushing can be enabled with --memrate-flush option
+stress-ng: metrc: [677] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [677]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [677] memrate              64     30.00    128.53      1.95         2.13           0.49
+stress-ng: info:  [677] skipped: 0
+stress-ng: info:  [677] passed: 8: memrate (8)
+stress-ng: info:  [677] failed: 0
+stress-ng: info:  [677] metrics untrustworthy: 0
+stress-ng: info:  [677] successful run completed in 30.01 secs
+2026-11-16T16:04:08Z ramp=8000MB/s/worker start
+stress-ng: info:  [695] setting to a 30 secs run per stressor
+stress-ng: info:  [695] dispatching hogs: 8 memrate
+stress-ng: info:  [695] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [696] memrate: using 512M per stressor instance (total 512M of 39.77G available memory)
+stress-ng: info:  [696] memrate: cache flushing disabled, cache flushing can be enabled with --memrate-flush option
+stress-ng: metrc: [695] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [695]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [695] memrate              96     30.00    227.21      1.12         3.20           0.42
+stress-ng: info:  [695] skipped: 0
+stress-ng: info:  [695] passed: 8: memrate (8)
+stress-ng: info:  [695] failed: 0
+stress-ng: info:  [695] metrics untrustworthy: 0
+stress-ng: info:  [695] successful run completed in 30.01 secs
+2026-11-16T16:04:38Z idle start
+2026-11-16T16:06:08Z done

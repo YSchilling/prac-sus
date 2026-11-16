@@ -1,0 +1,15 @@
+run,node,phase,start,end
+io-bound/r1,sut-01,idle,2026-11-16T16:11:57Z,2026-11-16T16:13:07Z
+io-bound/r1,sut-01,rwread-bs1M-depth1,2026-11-16T16:13:27Z,2026-11-16T16:14:08Z
+io-bound/r1,sut-01,rwread-bs1M-depth8,2026-11-16T16:14:28Z,2026-11-16T16:15:08Z
+io-bound/r1,sut-01,rwread-bs1M-depth32,2026-11-16T16:15:28Z,2026-11-16T16:16:08Z
+io-bound/r1,sut-01,rwwrite-bs1M-depth1,2026-11-16T16:16:28Z,2026-11-16T16:17:09Z
+io-bound/r1,sut-01,rwwrite-bs1M-depth8,2026-11-16T16:17:29Z,2026-11-16T16:18:09Z
+io-bound/r1,sut-01,rwwrite-bs1M-depth32,2026-11-16T16:18:29Z,2026-11-16T16:19:10Z
+io-bound/r1,sut-01,rwrandread-bs4k-depth1,2026-11-16T16:19:30Z,2026-11-16T16:20:10Z
+io-bound/r1,sut-01,rwrandread-bs4k-depth8,2026-11-16T16:20:30Z,2026-11-16T16:21:10Z
+io-bound/r1,sut-01,rwrandread-bs4k-depth32,2026-11-16T16:21:30Z,2026-11-16T16:22:11Z
+io-bound/r1,sut-01,rwrandwrite-bs4k-depth1,2026-11-16T16:22:31Z,2026-11-16T16:23:11Z
+io-bound/r1,sut-01,rwrandwrite-bs4k-depth8,2026-11-16T16:23:31Z,2026-11-16T16:24:12Z
+io-bound/r1,sut-01,rwrandwrite-bs4k-depth32,2026-11-16T16:24:32Z,2026-11-16T16:25:12Z
+io-bound/r1,sut-01,idle-2,2026-11-16T16:25:32Z,2026-11-16T16:26:42Z
