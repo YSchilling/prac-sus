@@ -1,0 +1,102 @@
+# Disk I/O workload on the measured SUT. RAPL measures package/DRAM, not disk power.
+#
+#   0. prepare: fully write and flush a 4 GiB file (outside measured phases)
+#   1. idle                              90 s
+#   2. sequential read, then write       1 MiB blocks, queue depths 1/8/32
+#   3. random read, then write           4 KiB blocks, queue depths 1/8/32
+#                                        each of the 12 phases lasts 60 s
+#   4. idle                              90 s
+#
+# About 15 minutes plus installation/preparation and final write flushes.
+# One fio worker; queue depth is concurrency, NOT a percentage of disk load.
+# direct=1 bypasses the OS page cache, not the device's internal cache.
+# Writes flush at each phase end; phase windows include that flush.
+#
+# The disk-backed emptyDir uses the SUT's kubelet storage, not the container
+# writable layer or network home. Requires local ext4/XFS backing and >=6 GiB
+# free space. Check the logged source against the SUT's disk topology before
+# interpreting results; an ext4/XFS filesystem could itself sit on remote storage.
+# No raw devices are written. The test file is removed on exit; deleting the
+# Job also releases its emptyDir. Run separately from the CPU/memory Jobs.
+#
+#   kubectl apply -f workloads/io-bound.yaml
+#   kubectl logs -f job/io-bound
+#
+# Compatible with tools/lab_repeat.sh and tools/lab_windows.py. fio reports
+# achieved bandwidth, IOPS, latency and depth distribution in the Job log.
+# Capture node_disk_* plus CPU system/iowait counters in the Prometheus snapshot;
+# tools/lab_export.py already exports disk MB/s and CPU system/iowait fractions.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: io-bound
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 2100
+  template:
+    metadata:
+      labels:
+        app: io-bound
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        role: sut
+      volumes:
+        - name: scratch
+          emptyDir:
+            sizeLimit: 6Gi
+      containers:
+        - name: fio
+          image: debian:trixie-slim
+          env:
+            - name: DEBIAN_FRONTEND
+              value: noninteractive
+          resources:
+            requests:
+              ephemeral-storage: 6Gi
+            limits:
+              ephemeral-storage: 8Gi
+          volumeMounts:
+            - name: scratch
+              mountPath: /scratch
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              apt-get update -qq && apt-get install -y -qq --no-install-recommends fio util-linux >/dev/null
+              mark() { echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*"; }
+              echo "Storage backing /scratch:"
+              findmnt -T /scratch -o TARGET,SOURCE,FSTYPE,OPTIONS
+              fstype=$(findmnt -n -T /scratch -o FSTYPE)
+              case "$fstype" in
+                ext4|xfs) ;;
+                *) echo "Expected disk-backed ext4/XFS, got $fstype; check the SUT storage." >&2; exit 1 ;;
+              esac
+              available=$(df -B1 --output=avail /scratch | tail -n 1)
+              if (( available < 6 * 1024 * 1024 * 1024 )); then
+                echo "Need at least 6 GiB free on /scratch." >&2
+                exit 1
+              fi
+              file=/scratch/io-bound.dat
+              trap 'rm -f -- "$file"' EXIT
+              common=(--filename="$file" --size=4G --ioengine=libaio --direct=1
+                      --numjobs=1 --group_reporting --exitall_on_error)
+              # Do not mark preparation as a training phase. Actually write all
+              # bytes: fallocate alone could leave unwritten extents/zero reads.
+              echo "Preparing 4 GiB test file before measurement"
+              fio --name=prepare "${common[@]}" --rw=write --bs=1M --iodepth=32 --end_fsync=1
+              mark "idle start"; sleep 90
+              for rw in read write randread randwrite; do
+                case "$rw" in
+                  read|write) bs=1M ;;
+                  *) bs=4k ;;
+                esac
+                for depth in 1 8 32; do
+                  mark "rw=$rw bs=$bs depth=$depth start"
+                  fio --name="$rw-qd$depth" "${common[@]}" --allow_file_create=0 \
+                    --rw="$rw" --bs="$bs" --iodepth="$depth" \
+                    --time_based --runtime=60s --end_fsync=1 --randseed=42
+                done
+              done
+              mark "idle start"; sleep 90
+              mark "done"
