@@ -1,0 +1,25 @@
+{
+  "snapshot": "lab-1117-sqlite",
+  "fetched_from": "lab:lab-runs/20261117-1528/",
+  "node": "sut-01",
+  "cp": "cp-01",
+  "tuning": "default",
+  "tuning_detected_from": "core frequency ranged 0.80-3.00 GHz",
+  "perf": "yes",
+  "range": "2026-11-17T15:28:48Z..2026-11-17T16:16:59Z",
+  "jobs": [
+    {
+      "job": "sqlite-app",
+      "round": 1,
+      "start": "2026-11-17T15:28:48Z",
+      "end": "2026-11-17T15:51:53Z"
+    },
+    {
+      "job": "sqlite-app",
+      "round": 2,
+      "start": "2026-11-17T15:52:54Z",
+      "end": "2026-11-17T16:15:56Z"
+    }
+  ],
+  "fetched_at": "2026-11-17T16:22:28Z"
+}

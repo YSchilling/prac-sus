@@ -1,0 +1,8 @@
+2026-11-17T15:28:16Z start rounds=2 jobs=prac-sus/workloads/sqlite-app.yaml node=cp-01 perf=1
+2026-11-17T15:28:18Z perf collector on (cpus 0-19)
+2026-11-17T15:28:48Z round=1 job=sqlite-app apply
+2026-11-17T15:51:53Z round=1 job=sqlite-app complete
+2026-11-17T15:52:54Z round=2 job=sqlite-app apply
+2026-11-17T16:15:56Z round=2 job=sqlite-app complete
+2026-11-17T16:16:59Z captured in-cluster Prometheus snapshot 20261117T161656Z-565d1b488b8af64e
+2026-11-17T16:16:59Z done
