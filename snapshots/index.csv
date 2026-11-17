@@ -14,3 +14,10 @@ lab-1117-perf,sut-01,*,default,yes,train,perf collector on
 lab-1117-perf,sut-01,mixed,default,yes,locked,new workload
 lab-1117-sqlite,sut-01,*,default,yes,train,
 lab-1117-sqlite,sut-01,sqlite-app/r2,default,yes,test,round 2 held out
+lab-1117-sut02-perf,sut-02,*,default,yes,train,
+lab-1117-sut02-perf,sut-02,cpu-bound/r2,default,yes,test,round 2 held out
+lab-1117-sut02-perf,sut-02,memory-bound/r2,default,yes,test,round 2 held out
+lab-1117-sut02-perf,sut-02,io-bound/r2,default,yes,test,round 2 held out
+lab-1117-sut02-perf,sut-02,sqlite-app/r2,default,yes,test,round 2 held out
+lab-1117-sut02-mixed,sut-02,*,default,yes,test,
+lab-1117-sut02-mixed,sut-02,mixed,default,yes,locked,new workload

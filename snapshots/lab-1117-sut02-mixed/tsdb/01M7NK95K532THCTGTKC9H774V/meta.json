@@ -1,0 +1,18 @@
+{
+	"ulid": "01M7NK95K532THCTGTKC9H774V",
+	"minTime": 1794938400088,
+	"maxTime": 1794947454428,
+	"stats": {
+		"numSamples": 43786642,
+		"numFloatSamples": 43786642,
+		"numSeries": 55444,
+		"numChunks": 394152
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01M7NK95K532THCTGTKC9H774V"
+		]
+	},
+	"version": 1
+}

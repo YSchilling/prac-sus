@@ -1,0 +1,18 @@
+{
+	"ulid": "01M7NK6FPEERD1Y1AHCY326SBA",
+	"minTime": 1794936566582,
+	"maxTime": 1794938400000,
+	"stats": {
+		"numSamples": 8725918,
+		"numFloatSamples": 8725918,
+		"numSeries": 54800,
+		"numChunks": 60130
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01M7NK6FPEERD1Y1AHCY326SBA"
+		]
+	},
+	"version": 1
+}

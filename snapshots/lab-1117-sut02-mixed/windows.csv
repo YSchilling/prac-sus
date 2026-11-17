@@ -1,0 +1,12 @@
+run,node,phase,start,end
+mixed/r1,sut-02,idle,2026-11-17T20:10:09Z,2026-11-17T20:11:19Z
+mixed/r1,sut-02,cpu-memory-cpu4-stream4-depth0,2026-11-17T20:11:39Z,2026-11-17T20:14:19Z
+mixed/r1,sut-02,cooldown,2026-11-17T20:14:39Z,2026-11-17T20:14:49Z
+mixed/r1,sut-02,cpu-io-cpu4-stream0-depth8,2026-11-17T20:15:09Z,2026-11-17T20:17:50Z
+mixed/r1,sut-02,cooldown-2,2026-11-17T20:18:10Z,2026-11-17T20:18:20Z
+mixed/r1,sut-02,memory-io-cpu0-stream4-depth8,2026-11-17T20:18:40Z,2026-11-17T20:21:20Z
+mixed/r1,sut-02,cooldown-3,2026-11-17T20:21:40Z,2026-11-17T20:21:50Z
+mixed/r1,sut-02,all-cpu4-stream4-depth8,2026-11-17T20:22:10Z,2026-11-17T20:24:51Z
+mixed/r1,sut-02,cooldown-4,2026-11-17T20:25:11Z,2026-11-17T20:25:21Z
+mixed/r1,sut-02,all-high-cpu8-stream8-depth32,2026-11-17T20:25:41Z,2026-11-17T20:28:21Z
+mixed/r1,sut-02,idle-2,2026-11-17T20:28:41Z,2026-11-17T20:29:51Z

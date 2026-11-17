@@ -1,0 +1,19 @@
+{
+  "snapshot": "lab-1117-sut02-mixed",
+  "fetched_from": "lab:lab-runs/20261117-2008/",
+  "node": "sut-02",
+  "cp": "cp-02",
+  "tuning": "default",
+  "tuning_detected_from": "core frequency ranged 0.83-2.98 GHz",
+  "perf": "yes",
+  "range": "2026-11-17T20:09:24Z..2026-11-17T20:30:59Z",
+  "jobs": [
+    {
+      "job": "mixed",
+      "round": 1,
+      "start": "2026-11-17T20:09:24Z",
+      "end": "2026-11-17T20:29:54Z"
+    }
+  ],
+  "fetched_at": "2026-11-17T20:31:23Z"
+}

@@ -1,0 +1,61 @@
+{
+  "snapshot": "lab-1117-sut02-perf",
+  "fetched_from": "lab:lab-runs/20261117-1730/",
+  "node": "sut-02",
+  "cp": "cp-02",
+  "tuning": "default",
+  "tuning_detected_from": "core frequency ranged 0.80-3.00 GHz",
+  "perf": "yes",
+  "range": "2026-11-17T17:31:05Z..2026-11-17T20:07:53Z",
+  "jobs": [
+    {
+      "job": "cpu-bound",
+      "round": 1,
+      "start": "2026-11-17T17:31:05Z",
+      "end": "2026-11-17T17:48:10Z"
+    },
+    {
+      "job": "memory-bound",
+      "round": 1,
+      "start": "2026-11-17T17:49:10Z",
+      "end": "2026-11-17T18:08:00Z"
+    },
+    {
+      "job": "io-bound",
+      "round": 1,
+      "start": "2026-11-17T18:09:01Z",
+      "end": "2026-11-17T18:24:25Z"
+    },
+    {
+      "job": "sqlite-app",
+      "round": 1,
+      "start": "2026-11-17T18:25:26Z",
+      "end": "2026-11-17T18:48:29Z"
+    },
+    {
+      "job": "cpu-bound",
+      "round": 2,
+      "start": "2026-11-17T18:49:29Z",
+      "end": "2026-11-17T19:06:32Z"
+    },
+    {
+      "job": "memory-bound",
+      "round": 2,
+      "start": "2026-11-17T19:07:33Z",
+      "end": "2026-11-17T19:26:20Z"
+    },
+    {
+      "job": "io-bound",
+      "round": 2,
+      "start": "2026-11-17T19:27:20Z",
+      "end": "2026-11-17T19:42:45Z"
+    },
+    {
+      "job": "sqlite-app",
+      "round": 2,
+      "start": "2026-11-17T19:43:45Z",
+      "end": "2026-11-17T20:06:48Z"
+    }
+  ],
+  "fetched_at": "2026-11-17T20:08:09Z"
+}

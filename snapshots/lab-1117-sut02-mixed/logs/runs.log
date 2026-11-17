@@ -1,0 +1,6 @@
+2026-11-17T20:08:54Z start rounds=1 jobs=prac-sus/workloads/mixed.yaml node=cp-02 perf=1
+2026-11-17T20:08:54Z perf collector already on
+2026-11-17T20:09:24Z round=1 job=mixed apply
+2026-11-17T20:29:54Z round=1 job=mixed complete
+2026-11-17T20:30:59Z captured in-cluster Prometheus snapshot 20261117T203054Z-2a16dab304f42d14
+2026-11-17T20:30:59Z done

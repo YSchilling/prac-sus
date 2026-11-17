@@ -1,0 +1,322 @@
+Storage backing /scratch:
+TARGET   SOURCE                                                                                                          FSTYPE OPTIONS
+/scratch /dev/mapper/vg_data-kubelet[/pods/b5a9042c-01cf-4584-8fa1-49d0faddbdf1/volumes/kubernetes.io~empty-dir/scratch] ext4   rw,noatime
+Preparing 4 GiB test file before measurement
+prepare: (g=0): rw=write, bs=(R) 1024KiB-1024KiB, (W) 1024KiB-1024KiB, (T) 1024KiB-1024KiB, ioengine=libaio, iodepth=32
+fio-3.39
+Starting 1 process
+prepare: Laying out IO file (1 file / 4096MiB)
+
+prepare: (groupid=0, jobs=1): err= 0: pid=1206: Tue Nov 17 20:09:49 2026
+  write: IOPS=2419, BW=2419MiB/s (2537MB/s)(4096MiB/1693msec); 0 zone resets
+    slat (usec): min=33, max=389, avg=79.98, stdev=42.14
+    clat (usec): min=1922, max=28902, avg=13067.25, stdev=1814.52
+     lat (usec): min=2009, max=28958, avg=13147.23, stdev=1814.34
+    clat percentiles (usec):
+     |  1.00th=[ 5473],  5.00th=[12387], 10.00th=[12518], 20.00th=[12649],
+     | 30.00th=[12649], 40.00th=[12780], 50.00th=[13042], 60.00th=[13173],
+     | 70.00th=[13304], 80.00th=[13435], 90.00th=[13698], 95.00th=[14091],
+     | 99.00th=[20841], 99.50th=[22414], 99.90th=[27395], 99.95th=[28181],
+     | 99.99th=[28967]
+   bw (  MiB/s): min= 2428, max= 2450, per=100.00%, avg=2441.33, stdev=11.72, samples=3
+   iops        : min= 2428, max= 2450, avg=2441.33, stdev=11.72, samples=3
+  lat (msec)   : 2=0.17%, 4=0.27%, 10=2.25%, 20=96.04%, 50=1.27%
+  cpu          : usr=8.92%, sys=12.41%, ctx=4060, majf=0, minf=9
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.2%, 16=0.4%, 32=99.2%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.1%, 64=0.0%, >=64=0.0%
+     issued rwts: total=0,4096,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=32
+
+Run status group 0 (all jobs):
+  WRITE: bw=2419MiB/s (2537MB/s), 2419MiB/s-2419MiB/s (2537MB/s-2537MB/s), io=4096MiB (4295MB), run=1693-1693msec
+
+Disk stats (read/write):
+    dm-3: ios=0/3965, sectors=0/8120320, merge=0/0, ticks=0/51396, in_queue=51396, util=93.60%, aggrios=0/32772, aggsectors=0/8388944, aggrmerge=0/39, aggrticks=0/420470, aggrin_queue=420476, aggrutil=85.64%
+  nvme1n1: ios=0/32772, sectors=0/8388944, merge=0/39, ticks=0/420470, in_queue=420476, util=85.64%
+2026-11-17T20:09:49Z idle start
+2026-11-17T20:11:19Z cpu-memory cpu=4 stream=4 depth=0 start
+stress-ng: info:  [1210] setting to a 3 mins run per stressor
+stress-ng: info:  [1210] dispatching hogs: 4 cpu, 4 stream
+stress-ng: info:  [1210] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [1215] stream: stressor loosely based on a variant of the STREAM benchmark code
+stress-ng: info:  [1215] stream: do NOT submit any of these results to the STREAM benchmark results
+stress-ng: info:  [1215] stream: Using cache size of 14080K
+stress-ng: info:  [1218] stream: memory rate: 8097.62 MB read/sec, 5398.41 MB write/sec, 707.58 double precision Mflop/sec (instance 3)
+stress-ng: info:  [1216] stream: memory rate: 8338.65 MB read/sec, 5559.10 MB write/sec, 728.64 double precision Mflop/sec (instance 1)
+stress-ng: info:  [1217] stream: memory rate: 8208.76 MB read/sec, 5472.51 MB write/sec, 717.29 double precision Mflop/sec (instance 2)
+stress-ng: info:  [1215] stream: memory rate: 8338.07 MB read/sec, 5558.72 MB write/sec, 728.59 double precision Mflop/sec (instance 0)
+stress-ng: metrc: [1210] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [1210]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [1210] cpu              838230    180.00    719.98      0.02      4656.75        1164.21
+stress-ng: metrc: [1210] stream            71545    180.00    719.93      0.07       397.46          99.37
+stress-ng: info:  [1210] skipped: 0
+stress-ng: info:  [1210] passed: 8: cpu (4) stream (4)
+stress-ng: info:  [1210] failed: 0
+stress-ng: info:  [1210] metrics untrustworthy: 0
+stress-ng: info:  [1210] successful run completed in 3 mins
+2026-11-17T20:14:19Z cooldown start
+2026-11-17T20:14:49Z cpu-io cpu=4 stream=0 depth=8 start
+stress-ng: info:  [1222] setting to a 3 mins run per stressor
+stress-ng: info:  [1222] dispatching hogs: 4 cpu
+stress-ng: info:  [1222] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+cpu-io: (g=0): rw=randrw, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=8
+fio-3.39
+Starting 1 process
+stress-ng: metrc: [1222] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [1222]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [1222] cpu              845636    180.00    719.96      0.02      4697.98        1174.52
+stress-ng: info:  [1222] skipped: 0
+stress-ng: info:  [1222] passed: 4: cpu (4)
+stress-ng: info:  [1222] failed: 0
+stress-ng: info:  [1222] metrics untrustworthy: 0
+stress-ng: info:  [1222] successful run completed in 3 mins
+
+cpu-io: (groupid=0, jobs=1): err= 0: pid=1249: Tue Nov 17 20:17:50 2026
+  read: IOPS=74.5k, BW=291MiB/s (305MB/s)(51.1GiB/180004msec)
+    slat (usec): min=2, max=4022, avg= 4.58, stdev= 2.80
+    clat (usec): min=9, max=13961, avg=84.07, stdev=82.94
+     lat (usec): min=29, max=13968, avg=88.65, stdev=82.94
+    clat percentiles (usec):
+     |  1.00th=[   46],  5.00th=[   49], 10.00th=[   52], 20.00th=[   57],
+     | 30.00th=[   61], 40.00th=[   66], 50.00th=[   71], 60.00th=[   77],
+     | 70.00th=[   84], 80.00th=[   95], 90.00th=[  118], 95.00th=[  163],
+     | 99.00th=[  289], 99.50th=[  314], 99.90th=[  478], 99.95th=[ 2442],
+     | 99.99th=[ 3097]
+   bw (  KiB/s): min=249160, max=313424, per=100.00%, avg=297965.75, stdev=13791.83, samples=359
+   iops        : min=62290, max=78356, avg=74491.45, stdev=3447.97, samples=359
+  write: IOPS=31.9k, BW=125MiB/s (131MB/s)(21.9GiB/180004msec); 0 zone resets
+    slat (usec): min=3, max=399, avg= 5.08, stdev= 2.93
+    clat (nsec): min=1333, max=13900k, avg=35856.54, stdev=18966.38
+     lat (usec): min=14, max=13916, avg=40.93, stdev=19.56
+    clat percentiles (usec):
+     |  1.00th=[   14],  5.00th=[   16], 10.00th=[   19], 20.00th=[   24],
+     | 30.00th=[   27], 40.00th=[   31], 50.00th=[   35], 60.00th=[   39],
+     | 70.00th=[   42], 80.00th=[   47], 90.00th=[   54], 95.00th=[   61],
+     | 99.00th=[   84], 99.50th=[   97], 99.90th=[  125], 99.95th=[  137],
+     | 99.99th=[  404]
+   bw (  KiB/s): min=106688, max=134752, per=100.00%, avg=127730.74, stdev=5865.18, samples=359
+   iops        : min=26672, max=33688, avg=31932.70, stdev=1466.29, samples=359
+  lat (usec)   : 2=0.01%, 4=0.01%, 10=0.01%, 20=3.84%, 50=26.60%
+  lat (usec)   : 100=57.98%, 250=10.24%, 500=1.26%, 750=0.01%, 1000=0.01%
+  lat (msec)   : 2=0.01%, 4=0.04%, 10=0.01%, 20=0.01%
+  cpu          : usr=26.09%, sys=53.58%, ctx=6354816, majf=0, minf=13
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=100.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.1%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=13401459,5744933,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=8
+
+Run status group 0 (all jobs):
+   READ: bw=291MiB/s (305MB/s), 291MiB/s-291MiB/s (305MB/s-305MB/s), io=51.1GiB (54.9GB), run=180004-180004msec
+  WRITE: bw=125MiB/s (131MB/s), 125MiB/s-125MiB/s (131MB/s-131MB/s), io=21.9GiB (23.5GB), run=180004-180004msec
+
+Disk stats (read/write):
+    dm-3: ios=13392755/5741288, sectors=107142040/45930024, merge=0/0, ticks=692572/40580, in_queue=733152, util=95.08%, aggrios=13401459/5745041, aggsectors=107211672/45960328, aggrmerge=0/36, aggrticks=926933/56752, aggrin_queue=983725, aggrutil=65.41%
+  nvme1n1: ios=13401459/5745041, sectors=107211672/45960328, merge=0/36, ticks=926933/56752, in_queue=983725, util=65.41%
+2026-11-17T20:17:50Z cooldown start
+2026-11-17T20:18:20Z memory-io cpu=0 stream=4 depth=8 start
+stress-ng: info:  [1253] setting to a 3 mins run per stressor
+stress-ng: info:  [1253] dispatching hogs: 4 stream
+stress-ng: info:  [1253] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [1255] stream: stressor loosely based on a variant of the STREAM benchmark code
+stress-ng: info:  [1255] stream: do NOT submit any of these results to the STREAM benchmark results
+stress-ng: info:  [1255] stream: Using cache size of 14080K
+memory-io: (g=0): rw=randrw, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=8
+fio-3.39
+Starting 1 process
+stress-ng: info:  [1255] stream: memory rate: 8230.34 MB read/sec, 5486.89 MB write/sec, 719.18 double precision Mflop/sec (instance 0)
+stress-ng: info:  [1257] stream: memory rate: 8054.94 MB read/sec, 5369.96 MB write/sec, 703.85 double precision Mflop/sec (instance 2)
+stress-ng: info:  [1256] stream: memory rate: 8384.04 MB read/sec, 5589.36 MB write/sec, 732.61 double precision Mflop/sec (instance 1)
+stress-ng: info:  [1258] stream: memory rate: 8375.44 MB read/sec, 5583.63 MB write/sec, 731.86 double precision Mflop/sec (instance 3)
+stress-ng: metrc: [1253] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [1253]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [1253] stream            71681    180.01    719.93      0.08       398.21          99.56
+stress-ng: info:  [1253] skipped: 0
+stress-ng: info:  [1253] passed: 4: stream (4)
+stress-ng: info:  [1253] failed: 0
+stress-ng: info:  [1253] metrics untrustworthy: 0
+stress-ng: info:  [1253] successful run completed in 3 mins
+
+memory-io: (groupid=0, jobs=1): err= 0: pid=1280: Tue Nov 17 20:21:20 2026
+  read: IOPS=72.8k, BW=284MiB/s (298MB/s)(50.0GiB/180004msec)
+    slat (usec): min=2, max=618, avg= 4.85, stdev= 2.83
+    clat (usec): min=10, max=14017, avg=85.24, stdev=81.87
+     lat (usec): min=45, max=14068, avg=90.09, stdev=81.87
+    clat percentiles (usec):
+     |  1.00th=[   46],  5.00th=[   50], 10.00th=[   53], 20.00th=[   58],
+     | 30.00th=[   63], 40.00th=[   68], 50.00th=[   73], 60.00th=[   79],
+     | 70.00th=[   86], 80.00th=[   96], 90.00th=[  120], 95.00th=[  161],
+     | 99.00th=[  285], 99.50th=[  314], 99.90th=[  486], 99.95th=[ 2409],
+     | 99.99th=[ 3064]
+   bw (  KiB/s): min=249688, max=306552, per=100.00%, avg=291399.93, stdev=12724.90, samples=359
+   iops        : min=62422, max=76638, avg=72850.01, stdev=3181.22, samples=359
+  write: IOPS=31.2k, BW=122MiB/s (128MB/s)(21.4GiB/180004msec); 0 zone resets
+    slat (usec): min=3, max=236, avg= 5.37, stdev= 3.25
+    clat (nsec): min=1520, max=14001k, avg=37879.58, stdev=19823.46
+     lat (usec): min=14, max=14024, avg=43.25, stdev=20.53
+    clat percentiles (usec):
+     |  1.00th=[   14],  5.00th=[   17], 10.00th=[   20], 20.00th=[   25],
+     | 30.00th=[   29], 40.00th=[   33], 50.00th=[   37], 60.00th=[   41],
+     | 70.00th=[   44], 80.00th=[   49], 90.00th=[   57], 95.00th=[   64],
+     | 99.00th=[   90], 99.50th=[  105], 99.90th=[  137], 99.95th=[  151],
+     | 99.99th=[  400]
+   bw (  KiB/s): min=106904, max=131968, per=100.00%, avg=124905.65, stdev=5374.57, samples=359
+   iops        : min=26726, max=32992, avg=31226.41, stdev=1343.64, samples=359
+  lat (usec)   : 2=0.01%, 10=0.01%, 20=3.24%, 50=25.42%, 100=59.11%
+  lat (usec)   : 250=10.95%, 500=1.21%, 750=0.01%, 1000=0.01%
+  lat (msec)   : 2=0.01%, 4=0.04%, 20=0.01%
+  cpu          : usr=26.49%, sys=54.34%, ctx=6070656, majf=0, minf=12
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=100.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.1%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=13104444,5617195,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=8
+
+Run status group 0 (all jobs):
+   READ: bw=284MiB/s (298MB/s), 284MiB/s-284MiB/s (298MB/s-298MB/s), io=50.0GiB (53.7GB), run=180004-180004msec
+  WRITE: bw=122MiB/s (128MB/s), 122MiB/s-122MiB/s (128MB/s-128MB/s), io=21.4GiB (23.0GB), run=180004-180004msec
+
+Disk stats (read/write):
+    dm-3: ios=13095709/5613424, sectors=104765672/44907112, merge=0/0, ticks=719528/43064, in_queue=762592, util=95.66%, aggrios=13104444/5617303, aggsectors=104835552/44938424, aggrmerge=0/36, aggrticks=900702/56083, aggrin_queue=956826, aggrutil=73.94%
+  nvme1n1: ios=13104444/5617303, sectors=104835552/44938424, merge=0/36, ticks=900702/56083, in_queue=956826, util=73.94%
+2026-11-17T20:21:20Z cooldown start
+2026-11-17T20:21:50Z all cpu=4 stream=4 depth=8 start
+stress-ng: info:  [1284] setting to a 3 mins run per stressor
+stress-ng: info:  [1284] dispatching hogs: 4 cpu, 4 stream
+stress-ng: info:  [1284] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [1290] stream: stressor loosely based on a variant of the STREAM benchmark code
+stress-ng: info:  [1290] stream: do NOT submit any of these results to the STREAM benchmark results
+stress-ng: info:  [1290] stream: Using cache size of 14080K
+all: (g=0): rw=randrw, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=8
+fio-3.39
+Starting 1 process
+stress-ng: info:  [1292] stream: memory rate: 8239.87 MB read/sec, 5493.25 MB write/sec, 720.01 double precision Mflop/sec (instance 2)
+stress-ng: info:  [1290] stream: memory rate: 8245.93 MB read/sec, 5497.29 MB write/sec, 720.54 double precision Mflop/sec (instance 0)
+stress-ng: info:  [1293] stream: memory rate: 8037.10 MB read/sec, 5358.07 MB write/sec, 702.29 double precision Mflop/sec (instance 3)
+stress-ng: info:  [1291] stream: memory rate: 8245.86 MB read/sec, 5497.24 MB write/sec, 720.53 double precision Mflop/sec (instance 1)
+stress-ng: metrc: [1284] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [1284]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [1284] cpu              798447    180.00    719.95      0.02      4435.80        1109.00
+stress-ng: metrc: [1284] stream            71079    180.00    719.95      0.05       394.87          98.72
+stress-ng: info:  [1284] skipped: 0
+stress-ng: info:  [1284] passed: 8: cpu (4) stream (4)
+stress-ng: info:  [1284] failed: 0
+stress-ng: info:  [1284] metrics untrustworthy: 0
+stress-ng: info:  [1284] successful run completed in 3 mins
+
+all: (groupid=0, jobs=1): err= 0: pid=1315: Tue Nov 17 20:24:51 2026
+  read: IOPS=68.9k, BW=269MiB/s (282MB/s)(47.3GiB/180004msec)
+    slat (usec): min=2, max=1502, avg= 5.41, stdev= 3.15
+    clat (usec): min=20, max=13976, avg=88.59, stdev=81.08
+     lat (usec): min=43, max=14021, avg=94.00, stdev=81.14
+    clat percentiles (usec):
+     |  1.00th=[   47],  5.00th=[   51], 10.00th=[   55], 20.00th=[   61],
+     | 30.00th=[   67], 40.00th=[   72], 50.00th=[   77], 60.00th=[   83],
+     | 70.00th=[   91], 80.00th=[  101], 90.00th=[  122], 95.00th=[  157],
+     | 99.00th=[  281], 99.50th=[  314], 99.90th=[  486], 99.95th=[ 2409],
+     | 99.99th=[ 3064]
+   bw (  KiB/s): min=236888, max=298888, per=100.00%, avg=275598.38, stdev=13133.35, samples=359
+   iops        : min=59222, max=74722, avg=68899.60, stdev=3283.32, samples=359
+  write: IOPS=29.5k, BW=115MiB/s (121MB/s)(20.3GiB/180004msec); 0 zone resets
+    slat (usec): min=3, max=1440, avg= 6.15, stdev= 3.82
+    clat (nsec): min=1355, max=13985k, avg=42617.74, stdev=21620.26
+     lat (usec): min=14, max=14005, avg=48.77, stdev=22.70
+    clat percentiles (usec):
+     |  1.00th=[   15],  5.00th=[   19], 10.00th=[   22], 20.00th=[   29],
+     | 30.00th=[   33], 40.00th=[   37], 50.00th=[   41], 60.00th=[   45],
+     | 70.00th=[   49], 80.00th=[   56], 90.00th=[   65], 95.00th=[   74],
+     | 99.00th=[   95], 99.50th=[  104], 99.90th=[  137], 99.95th=[  159],
+     | 99.99th=[  416]
+   bw (  KiB/s): min=101488, max=128464, per=100.00%, avg=118136.36, stdev=5605.85, samples=359
+   iops        : min=25372, max=32116, avg=29534.08, stdev=1401.45, samples=359
+  lat (usec)   : 2=0.01%, 4=0.01%, 10=0.01%, 20=2.12%, 50=22.29%
+  lat (usec)   : 100=60.92%, 250=13.47%, 500=1.13%, 750=0.01%, 1000=0.01%
+  lat (msec)   : 2=0.01%, 4=0.04%, 20=0.01%
+  cpu          : usr=27.00%, sys=55.45%, ctx=5684786, majf=0, minf=11
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=100.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.1%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=12395236,5313156,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=8
+
+Run status group 0 (all jobs):
+   READ: bw=269MiB/s (282MB/s), 269MiB/s-269MiB/s (282MB/s-282MB/s), io=47.3GiB (50.8GB), run=180004-180004msec
+  WRITE: bw=115MiB/s (121MB/s), 115MiB/s-115MiB/s (121MB/s-121MB/s), io=20.3GiB (21.8GB), run=180004-180004msec
+
+Disk stats (read/write):
+    dm-3: ios=12386236/5309517, sectors=99089888/42475856, merge=0/0, ticks=824856/48944, in_queue=873800, util=99.19%, aggrios=12395236/5313264, aggsectors=99161888/42506112, aggrmerge=0/36, aggrticks=843682/53993, aggrin_queue=897715, aggrutil=89.81%
+  nvme1n1: ios=12395236/5313264, sectors=99161888/42506112, merge=0/36, ticks=843682/53993, in_queue=897715, util=89.81%
+2026-11-17T20:24:51Z cooldown start
+2026-11-17T20:25:21Z all-high cpu=8 stream=8 depth=32 start
+stress-ng: info:  [1319] setting to a 3 mins run per stressor
+stress-ng: info:  [1319] dispatching hogs: 8 cpu, 8 stream
+stress-ng: info:  [1319] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+stress-ng: info:  [1329] stream: stressor loosely based on a variant of the STREAM benchmark code
+stress-ng: info:  [1329] stream: do NOT submit any of these results to the STREAM benchmark results
+stress-ng: info:  [1329] stream: Using cache size of 14080K
+all-high: (g=0): rw=randrw, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=32
+fio-3.39
+Starting 1 process
+stress-ng: info:  [1333] stream: memory rate: 4678.37 MB read/sec, 3118.91 MB write/sec, 408.80 double precision Mflop/sec (instance 4)
+stress-ng: info:  [1331] stream: memory rate: 5473.81 MB read/sec, 3649.21 MB write/sec, 478.31 double precision Mflop/sec (instance 2)
+stress-ng: info:  [1335] stream: memory rate: 4712.76 MB read/sec, 3141.84 MB write/sec, 411.81 double precision Mflop/sec (instance 6)
+stress-ng: info:  [1332] stream: memory rate: 5424.64 MB read/sec, 3616.43 MB write/sec, 474.01 double precision Mflop/sec (instance 3)
+stress-ng: info:  [1329] stream: memory rate: 4576.56 MB read/sec, 3051.04 MB write/sec, 399.91 double precision Mflop/sec (instance 0)
+stress-ng: info:  [1330] stream: memory rate: 4793.10 MB read/sec, 3195.40 MB write/sec, 418.83 double precision Mflop/sec (instance 1)
+stress-ng: info:  [1334] stream: memory rate: 5189.80 MB read/sec, 3459.87 MB write/sec, 453.49 double precision Mflop/sec (instance 5)
+stress-ng: info:  [1336] stream: memory rate: 6063.02 MB read/sec, 4042.01 MB write/sec, 529.79 double precision Mflop/sec (instance 7)
+stress-ng: metrc: [1319] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+stress-ng: metrc: [1319]                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+stress-ng: metrc: [1319] cpu             1233811    180.00   1439.25      0.08      6854.48         857.21
+stress-ng: metrc: [1319] stream           177531    180.00   1439.55      0.14       986.28         123.31
+stress-ng: info:  [1319] skipped: 0
+stress-ng: info:  [1319] passed: 16: cpu (8) stream (8)
+stress-ng: info:  [1319] failed: 0
+stress-ng: info:  [1319] metrics untrustworthy: 0
+stress-ng: info:  [1319] successful run completed in 3 mins
+
+all-high: (groupid=0, jobs=1): err= 0: pid=1358: Tue Nov 17 20:28:21 2026
+  read: IOPS=63.8k, BW=249MiB/s (261MB/s)(43.8GiB/180004msec)
+    slat (usec): min=2, max=5691, avg= 7.25, stdev= 8.05
+    clat (usec): min=32, max=14275, avg=352.88, stdev=134.25
+     lat (usec): min=47, max=14280, avg=360.13, stdev=135.10
+    clat percentiles (usec):
+     |  1.00th=[  124],  5.00th=[  239], 10.00th=[  255], 20.00th=[  281],
+     | 30.00th=[  310], 40.00th=[  338], 50.00th=[  355], 60.00th=[  371],
+     | 70.00th=[  388], 80.00th=[  408], 90.00th=[  437], 95.00th=[  461],
+     | 99.00th=[  562], 99.50th=[  619], 99.90th=[ 2540], 99.95th=[ 3032],
+     | 99.99th=[ 4359]
+   bw (  KiB/s): min=210144, max=335888, per=100.00%, avg=255406.78, stdev=39708.50, samples=359
+   iops        : min=52536, max=83972, avg=63851.67, stdev=9927.15, samples=359
+  write: IOPS=27.4k, BW=107MiB/s (112MB/s)(18.8GiB/180004msec); 0 zone resets
+    slat (usec): min=3, max=4814, avg= 8.03, stdev= 9.42
+    clat (usec): min=7, max=13995, avg=317.62, stdev=121.96
+     lat (usec): min=16, max=14007, avg=325.64, stdev=123.20
+    clat percentiles (usec):
+     |  1.00th=[  176],  5.00th=[  210], 10.00th=[  223], 20.00th=[  241],
+     | 30.00th=[  269], 40.00th=[  302], 50.00th=[  318], 60.00th=[  334],
+     | 70.00th=[  351], 80.00th=[  371], 90.00th=[  400], 95.00th=[  420],
+     | 99.00th=[  635], 99.50th=[  783], 99.90th=[ 1090], 99.95th=[ 1598],
+     | 99.99th=[ 4424]
+   bw (  KiB/s): min=89178, max=143360, per=100.00%, avg=109484.36, stdev=17068.22, samples=359
+   iops        : min=22294, max=35840, avg=27371.04, stdev=4267.07, samples=359
+  lat (usec)   : 10=0.01%, 20=0.02%, 50=0.08%, 100=0.50%, 250=12.26%
+  lat (usec)   : 500=84.96%, 750=1.83%, 1000=0.15%
+  lat (msec)   : 2=0.09%, 4=0.10%, 10=0.02%, 20=0.01%
+  cpu          : usr=27.25%, sys=59.93%, ctx=4713747, majf=0, minf=11
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=100.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.1%, 64=0.0%, >=64=0.0%
+     issued rwts: total=11489059,4925087,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=32
+
+Run status group 0 (all jobs):
+   READ: bw=249MiB/s (261MB/s), 249MiB/s-249MiB/s (261MB/s-261MB/s), io=43.8GiB (47.1GB), run=180004-180004msec
+  WRITE: bw=107MiB/s (112MB/s), 107MiB/s-107MiB/s (112MB/s-112MB/s), io=18.8GiB (20.2GB), run=180004-180004msec
+
+Disk stats (read/write):
+    dm-3: ios=11482393/4922417, sectors=91859144/39379056, merge=0/0, ticks=805392/47924, in_queue=853316, util=98.62%, aggrios=11489059/4925196, aggsectors=91912472/39401576, aggrmerge=0/37, aggrticks=815021/53945, aggrin_queue=869007, aggrutil=88.57%
+  nvme1n1: ios=11489059/4925196, sectors=91912472/39401576, merge=0/37, ticks=815021/53945, in_queue=869007, util=88.57%
+2026-11-17T20:28:21Z idle start
+2026-11-17T20:29:51Z done
