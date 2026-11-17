@@ -151,6 +151,14 @@ tools/lab_fetch.py lab-1118-perf --role train
 python3 tools/lab_eval.py --coef python/coef-default-profile.json python/coef-perf.json
 ```
 
+To compare model variants before changing the model, `tools/experiment.py`
+(run with `.venv/bin/python`) fits each variant in `VARIANTS` the same way and
+reports, in this order: the error on a workload new to the model (io-bound
+and the sqlite app left out of training, pooled; the number that decides),
+the test rounds (a check), and extrapolation (cpu-bound or memory-bound left
+out; not a criterion). Tuned settings are chosen without the held-out
+workload. A new variant is a feature function of a few lines.
+
 `lab_eval.py` predicts with `powermodel.at()` and scores with
 `tools/score.py`'s `metrics()`, so its numbers are the ones the hand-in path
 gives. `lab_fetch.py` reads the tuning profile from the data (clean-room pins
