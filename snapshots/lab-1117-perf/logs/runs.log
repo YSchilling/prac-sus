@@ -1,0 +1,12 @@
+2026-11-17T12:18:01Z start rounds=1 jobs=prac-sus/workloads/cpu-bound.yaml prac-sus/workloads/memory-bound.yaml prac-sus/workloads/io-bound.yaml prac-sus/workloads/mixed.yaml node=cp-01 perf=1
+2026-11-17T12:18:01Z perf collector already on
+2026-11-17T12:18:31Z round=1 job=cpu-bound apply
+2026-11-17T12:35:36Z round=1 job=cpu-bound complete
+2026-11-17T12:36:36Z round=1 job=memory-bound apply
+2026-11-17T12:55:22Z round=1 job=memory-bound complete
+2026-11-17T12:56:23Z round=1 job=io-bound apply
+2026-11-17T13:11:48Z round=1 job=io-bound complete
+2026-11-17T13:12:48Z round=1 job=mixed apply
+2026-11-17T13:33:18Z round=1 job=mixed complete
+2026-11-17T13:34:21Z captured in-cluster Prometheus snapshot 20261117T133418Z-13f7308ff485fa57
+2026-11-17T13:34:21Z done
