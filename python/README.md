@@ -213,14 +213,18 @@ clean-room profile), and there the default-profile fit is worse.
 second from node-exporter's perf collector, as a stand-in for memory traffic:
 
 ```text
-package = max(0, 20.85 + 29.21 * r + 18.94 * awake + 1.59 * miss_gbps)
-dram    = max(0,  3.41 +  2.29 * awake + 1.38 * miss_gbps)
+package = max(0, 21.31 + 28.87 * r + 19.06 * awake + 1.56 * miss_gbps)
+dram    = max(0,  3.84 +  2.68 * awake + 1.36 * miss_gbps)
 ```
 
 Fitted on cpu/memory/io-bound of
-[`snapshots/lab-1117-perf`](../snapshots/lab-1117-perf/README.md) and tested
-on its mixed run: 4.49 W package / 1.11 W DRAM MAE, against 7.68 / 4.74 W
-for a CPU-only fit on the same data. It needs `node_perf_cache_misses_total`
+[`snapshots/lab-1117-perf`](../snapshots/lab-1117-perf/README.md) (sut-01)
+and round 1 of [`snapshots/lab-1117-sut02-perf`](../snapshots/lab-1117-sut02-perf/README.md)
+(sut-02, including the sqlite app):
+`train.py --select "tuning=default perf=yes role=train" --perf`. On the test
+rounds of both machines it scores 3.49 W package / 1.32 W DRAM MAE; fitted on
+sut-01 alone it already transferred to sut-02 at 3.69 / 1.64 W, against
+7.94 / 3.54 W for the CPU-only model. It needs `node_perf_cache_misses_total`
 (`tools/lab_repeat.sh --perf` turns the collector on); without it offline mode
 stops with a message and online mode answers 503. It is reproduced by
 `train.py --select "tuning=default perf=yes role=train" --perf`, which leaves
