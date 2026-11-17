@@ -40,6 +40,14 @@ CPU_MODES = {"user", "nice", "system", "irq", "softirq"}
 # (0.05 overshot the 2-6 % CPU of io-bound).
 AWAKE_SCALE = 0.1
 COEF_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coef.json")
+# Hardware-counter variant (train.py --perf): miss_gbps is last-level cache
+# misses x 64-byte lines per second, in GB/s, a stand-in for memory traffic,
+# which CPU time cannot see. It needs node-exporter's perf collector, which a
+# VM only has with a virtual PMU and CAP_PERFMON. A coefficient file that names
+# no PERF_FEATURES never fetches the counter.
+PERF_FEATURES = {"miss_gbps"}
+PERF_ZONE_FEATURES = {"package": ("ratio", "awake", "miss_gbps"), "dram": ("awake", "miss_gbps")}
+CACHE_LINE_BYTES = 64
 
 
 def query_range(prom, selector, start, end, step):
@@ -68,6 +76,25 @@ def fetch(a, start, end):
     pods = query_range(a.prometheus, f'container_cpu_usage_seconds_total{{pod!="",container!="",node="{a.node}"}}',
                        start, end, a.step)
     return cpu, pods
+
+
+def fetch_misses(a, start, end):
+    """Per-CPU last-level cache miss counters on the step grid."""
+    return query_range(a.prometheus, f'node_perf_cache_misses_total{{node="{a.node}"}}', start, end, a.step)
+
+
+def needs_perf(coef):
+    return any(f in PERF_FEATURES for c in coef.values() for f in c["weights"])
+
+
+def miss_features(now, prev, step):
+    """{"miss_gbps"} from per-CPU miss counters, or None if a CPU is missing
+    or a counter is not finite. A reset counts as zero, like counter_delta."""
+    if not now or now.keys() != prev.keys():
+        return None
+    if not all(math.isfinite(v) for v in (*now.values(), *prev.values())):
+        return None
+    return {"miss_gbps": counter_delta(now, prev) * CACHE_LINE_BYTES / step / 1e9}
 
 
 def counter_delta(now, prev):
@@ -136,12 +163,18 @@ def predict(coef, x, pods, busy_seconds):
     return rows
 
 
-def at(coef, cpu, pods, ts, step):
-    """{zone: (node_w, active_w, {pod: w})} at ts, or None on a gap."""
+def at(coef, cpu, pods, ts, step, misses=None):
+    """{zone: (node_w, active_w, {pod: w})} at ts, or None on a gap.
+    misses (fetch_misses) is needed only by a coefficient file that uses it."""
     now, prev = cpu.get(ts, {}), cpu.get(ts - step, {})
     x = features(now, prev, step)
     if x is None:
         return None
+    if needs_perf(coef):
+        m = miss_features((misses or {}).get(ts, {}), (misses or {}).get(ts - step, {}), step)
+        if m is None:
+            return None
+        x.update(m)
     per_pod = pod_cpu(pods.get(ts, {}), pods.get(ts - step, {}))
     return predict(coef, x, per_pod, counter_delta(now, prev))
 
@@ -156,6 +189,10 @@ def offline(a):
     if not cpu:
         sys.exit(f"no node_cpu_seconds_total for node={a.node!r} in {a.range}: "
                  "wrong node name, or outside the snapshot's span?")
+    misses = fetch_misses(a, start, end) if needs_perf(coef) else None
+    if needs_perf(coef) and not misses:
+        sys.exit(f"{a.coef} needs node_perf_cache_misses_total, which has no samples for node={a.node!r}: "
+                 "turn on node-exporter's perf collector, or use a coefficient file without miss_gbps")
 
     with open(a.out, "w", newline="") as f:
         w = csv.writer(f)
@@ -163,7 +200,7 @@ def offline(a):
         n = 0
         # The first step only provides the previous sample (CONTRACT.md).
         for ts in range(start + a.step, end + 1, a.step):
-            rows = at(coef, cpu, pods, ts, a.step)
+            rows = at(coef, cpu, pods, ts, a.step, misses)
             if rows is None:
                 continue  # a gap: no row, and the scorer counts the miss
             for zone, (node, active, share) in rows.items():
@@ -196,12 +233,13 @@ def online(a):
             # /proc reader would hold in memory, nothing older.
             ts = int(time.time()) // a.step * a.step
             try:
-                rows = at(coef, *fetch(a, ts - a.step, ts), ts, a.step)
+                misses = fetch_misses(a, ts - a.step, ts) if needs_perf(coef) else None
+                rows = at(coef, *fetch(a, ts - a.step, ts), ts, a.step, misses)
             except (OSError, RuntimeError) as e:
                 return self.send_error(503, str(e))
             if rows is None:
                 # Zero watts would be a number pretending to be an estimate.
-                return self.send_error(503, f"missing, incomplete or reset CPU samples for node={a.node!r} at {ts}")
+                return self.send_error(503, f"missing, incomplete or reset CPU or perf samples for node={a.node!r} at {ts}")
             body = metrics(a, rows).encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; version=0.0.4")

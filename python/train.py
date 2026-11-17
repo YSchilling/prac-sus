@@ -39,25 +39,31 @@ def truth(path, node):
     return out
 
 
-def rows(snapshot, prom, node, step):
-    """[(features, {zone: watts})] for every step with signals and truth."""
+def rows(snapshot, prom, node, step, perf=False):
+    """[(features, {zone: watts})] for every step with signals and truth.
+    perf adds miss_gbps and drops steps without cache-miss samples."""
     span = open(os.path.join(snapshot, "span.txt")).read().strip()
     start, end = (int(datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp())
                   for s in span.split(".."))
-    cpu, _ = pm.fetch(SimpleNamespace(prometheus=prom, node=node, step=step), start, end)
+    a = SimpleNamespace(prometheus=prom, node=node, step=step)
+    cpu, _ = pm.fetch(a, start, end)
+    misses = pm.fetch_misses(a, start, end) if perf else {}
     y = truth(os.path.join(snapshot, "truth.csv"), node)
     out = []
     for ts in range(start + step, end + 1, step):
         now, prev = cpu.get(ts, {}), cpu.get(ts - step, {})
         x = pm.features(now, prev, step)
+        if x is not None and perf:
+            m = pm.miss_features(misses.get(ts, {}), misses.get(ts - step, {}), step)
+            x = None if m is None else {**x, **m}
         labels = {z: y[(ts, z)] for z in ZONES if (ts, z) in y}
         if x is not None and len(labels) == len(ZONES):
             out.append((x, labels))
     return out
 
 
-def matrix(data, zone):
-    names = pm.ZONE_FEATURES[zone]
+def matrix(data, zone, zone_features=pm.ZONE_FEATURES):
+    names = zone_features[zone]
     return names, np.array([[x[n] for n in names] for x, _ in data]), np.array([y[zone] for _, y in data])
 
 
@@ -67,14 +73,17 @@ def main():
     ap.add_argument("--nodes", default="sut-01,sut-02")
     ap.add_argument("--step", type=int, default=10)
     ap.add_argument("--out", default=pm.COEF_FILE)
+    ap.add_argument("--perf", action="store_true",
+                    help="add the cache-miss feature (needs node_perf_cache_misses_total in every snapshot)")
     a = ap.parse_args()
+    zf = pm.PERF_ZONE_FEATURES if a.perf else pm.ZONE_FEATURES
 
     data = {}  # (snapshot, node) -> rows
     for spec in a.snapshot:
         snapshot, _, prom = spec.partition("=")
         name = os.path.basename(snapshot.rstrip("/"))
         for node in a.nodes.split(","):
-            data[(name, node)] = rows(snapshot, prom, node, a.step)
+            data[(name, node)] = rows(snapshot, prom, node, a.step, a.perf)
             print(f"{name}/{node}: {len(data[(name, node)])} steps", file=sys.stderr)
 
     snaps = sorted({s for s, _ in data})
@@ -83,17 +92,17 @@ def main():
         for zone in ZONES:
             for held in snaps:
                 train = [r for (s, _), rs in data.items() if s != held for r in rs]
-                names, X, Y = matrix(train, zone)
+                names, X, Y = matrix(train, zone, zf)
                 m = LinearRegression().fit(X, Y)
                 for (s, node), rs in sorted(data.items()):
                     if s == held and rs:
-                        _, Xt, Yt = matrix(rs, zone)
+                        _, Xt, Yt = matrix(rs, zone, zf)
                         print(f"  {zone:<8} {s}/{node:<8} {np.mean(np.abs(np.maximum(m.predict(Xt), 0.0) - Yt)):7.3f}")
 
     everything = [r for rs in data.values() for r in rs]
     coef = {}
     for zone in ZONES:
-        names, X, Y = matrix(everything, zone)
+        names, X, Y = matrix(everything, zone, zf)
         m = LinearRegression().fit(X, Y)
         coef[zone] = {"intercept": round(float(m.intercept_), 6),
                       "weights": {n: round(float(w), 6) for n, w in zip(names, m.coef_)}}

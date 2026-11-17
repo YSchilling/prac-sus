@@ -109,7 +109,7 @@ On bare metal, set the two hardware values in
 
 The flags from `CONTRACT.md`, plus `--listen` (online, default `:9270`),
 `--out` (offline, default `predictions.csv`) and `--coef` (coefficient file,
-default `coef.json`). Each can also be set as
+default `coef.json`; `coef-default-profile.json` and `coef-perf.json` are the other two). Each can also be set as
 `POWERMODEL_<FLAG>`.
 
 ## Verification
@@ -173,6 +173,26 @@ one model serves both nodes in the default profile.
 Keep `coef.json` for the course snapshots: they look like a different CPU
 configuration (sut-02 idles at 33 W and never sleeps, like the lab's
 clean-room profile), and there the default-profile fit is worse.
+
+## Cache-miss variant (2026-11-17)
+
+`coef-perf.json` adds `miss_gbps`, last-level cache misses x 64 bytes per
+second from node-exporter's perf collector, as a stand-in for memory traffic:
+
+```text
+package = max(0, 20.73 + 29.10 * r + 19.14 * awake + 1.59 * miss_gbps)
+dram    = max(0,  3.37 +  2.34 * awake + 1.38 * miss_gbps)
+```
+
+Fitted on cpu/memory/io-bound of
+[`snapshots/lab-1117-perf`](../snapshots/lab-1117-perf/README.md) and tested
+on its mixed run: 4.46 W package / 1.10 W DRAM MAE, against 7.68 / 4.74 W
+for a CPU-only fit on the same data. It needs `node_perf_cache_misses_total`
+(`tools/lab_repeat.sh --perf` turns the collector on); without it offline mode
+stops with a message and online mode answers 503. `train.py --perf` fits it,
+but over a snapshot's whole span; this file was fitted without the mixed job,
+which `train.py` can't exclude yet. The collector itself raises idle power by
+about 2 W, so only use this file where it runs.
 
 ## Current trained baseline (2026-11-03)
 

@@ -79,6 +79,26 @@ class CPUModelTests(unittest.TestCase):
         self.assertEqual(pm.predict(old, x, {}, 0)["dram"][0], 6)
         self.assertAlmostEqual(pm.predict(new, x, {}, 0)["dram"][0], 1 + 5 * x["awake"])
 
+    def test_miss_features_turn_cache_misses_into_gbps(self):
+        prev = {json.dumps({"cpu": str(c)}): 1e6 for c in range(2)}
+        now = {json.dumps({"cpu": str(c)}): 1e6 + 5e7 for c in range(2)}
+        # 2 CPUs x 5e7 misses x 64 B over 10 s = 0.64 GB/s
+        self.assertAlmostEqual(pm.miss_features(now, prev, 10)["miss_gbps"], 0.64)
+        self.assertIsNone(pm.miss_features({}, prev, 10))
+        self.assertIsNone(pm.miss_features(dict(list(now.items())[:1]), prev, 10))
+
+    def test_perf_coefficients_need_misses_and_cpu_only_ones_ignore_them(self):
+        cpu = {0: {k: v for k, v in samples().items() if json.loads(k)["mode"] in pm.CPU_MODES},
+               10: {k: v for k, v in samples(user=2).items() if json.loads(k)["mode"] in pm.CPU_MODES}}
+        perf = {"dram": {"intercept": 1, "weights": {"awake": 0, "miss_gbps": 2}}}
+        plain = {"dram": {"intercept": 1, "weights": {"awake": 0}}}
+        misses = {0: {json.dumps({"cpu": "0"}): 0}, 10: {json.dumps({"cpu": "0"}): 1.5625e8}}  # 1 GB/s
+        self.assertTrue(pm.needs_perf(perf))
+        self.assertFalse(pm.needs_perf(plain))
+        self.assertAlmostEqual(pm.at(perf, cpu, {}, 10, 10, misses)["dram"][0], 3)
+        self.assertIsNone(pm.at(perf, cpu, {}, 10, 10))
+        self.assertEqual(pm.at(plain, cpu, {}, 10, 10)["dram"][0], 1)
+
     def test_coef_file_comes_from_flag_or_env(self):
         seen = []
         with patch.object(pm, "offline", side_effect=lambda a: seen.append(a.coef)), \

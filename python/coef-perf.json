@@ -1,0 +1,17 @@
+{
+  "package": {
+    "intercept": 20.728738,
+    "weights": {
+      "ratio": 29.095113,
+      "awake": 19.144432,
+      "miss_gbps": 1.589741
+    }
+  },
+  "dram": {
+    "intercept": 3.36786,
+    "weights": {
+      "awake": 2.337669,
+      "miss_gbps": 1.377927
+    }
+  }
+}
