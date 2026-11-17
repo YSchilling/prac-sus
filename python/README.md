@@ -124,6 +124,39 @@ Hardware flags are metadata; they do not calibrate coefficients to a different
 CPU. Successful VM inference verifies availability and output, not physical
 power accuracy: the VM's synthetic power is not a validation target.
 
+## From a lab run to numbers
+
+[`snapshots/index.csv`](../snapshots/index.csv) lists every snapshot with its
+node, tuning profile, whether it has cache-miss counters (`perf`) and its
+role: `train`, `test`, `locked` (a test set looked at only at milestones) or
+`course`. A row with job `*` covers the whole snapshot; a row for one job
+overrides it, so the mixed jobs are `locked` while the rest of their run is
+training or test data. [`labdata.py`](labdata.py) reads it and serves
+snapshots on free ports.
+
+```sh
+# on the lab: run the workloads (see tools/lab_repeat.sh)
+ssh cp-01 'nohup setsid prac-sus/lab_repeat.sh --perf 2 prac-sus/workloads/{cpu-bound,memory-bound,io-bound,mixed}.yaml >/dev/null 2>&1 </dev/null &'
+
+# here: download and build snapshots/<name>/, detect node, tuning and perf,
+# and add its index.csv rows (mixed is always added as locked)
+tools/lab_fetch.py lab-1118-perf --role train
+
+# fit on a selection; --holdout job leaves out one workload at a time
+.venv/bin/python python/train.py --select "tuning=default perf=yes role=train" --perf --holdout job \
+    --out python/coef-perf.json
+
+# score coefficient files on the test data (default role=test); --locked adds
+# the locked jobs, --phases a row per phase, --csv writes the table to a file
+python3 tools/lab_eval.py --coef python/coef-default-profile.json python/coef-perf.json
+```
+
+`lab_eval.py` predicts with `powermodel.at()` and scores with
+`tools/score.py`'s `metrics()`, so its numbers are the ones the hand-in path
+gives. `lab_fetch.py` reads the tuning profile from the data (clean-room pins
+every core at one frequency), since Slurm forgets it once a booking ends, and
+writes what it found to the snapshot's `run.json`.
+
 ## Default-profile model (2026-11-16)
 
 `coef-default-profile.json` is fitted on our own lab runs with the default CPU
@@ -180,18 +213,18 @@ clean-room profile), and there the default-profile fit is worse.
 second from node-exporter's perf collector, as a stand-in for memory traffic:
 
 ```text
-package = max(0, 20.73 + 29.10 * r + 19.14 * awake + 1.59 * miss_gbps)
-dram    = max(0,  3.37 +  2.34 * awake + 1.38 * miss_gbps)
+package = max(0, 20.85 + 29.21 * r + 18.94 * awake + 1.59 * miss_gbps)
+dram    = max(0,  3.41 +  2.29 * awake + 1.38 * miss_gbps)
 ```
 
 Fitted on cpu/memory/io-bound of
 [`snapshots/lab-1117-perf`](../snapshots/lab-1117-perf/README.md) and tested
-on its mixed run: 4.46 W package / 1.10 W DRAM MAE, against 7.68 / 4.74 W
+on its mixed run: 4.49 W package / 1.11 W DRAM MAE, against 7.68 / 4.74 W
 for a CPU-only fit on the same data. It needs `node_perf_cache_misses_total`
 (`tools/lab_repeat.sh --perf` turns the collector on); without it offline mode
-stops with a message and online mode answers 503. `train.py --perf` fits it,
-but over a snapshot's whole span; this file was fitted without the mixed job,
-which `train.py` can't exclude yet. The collector itself raises idle power by
+stops with a message and online mode answers 503. It is reproduced by
+`train.py --select "tuning=default perf=yes role=train" --perf`, which leaves
+the locked mixed job out. The collector itself raises idle power by
 about 2 W, so only use this file where it runs.
 
 ## Current trained baseline (2026-11-03)

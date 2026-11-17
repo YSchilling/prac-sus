@@ -7,3 +7,6 @@ snapshots/*/tsdb/lock
 snapshots/*/tsdb/queries.active
 snapshots/*/tsdb/wal/
 snapshots/*/tsdb/chunks_head/
+
+# tools/prom.sh output when python/labdata.py serves a snapshot
+snapshots/*/.prom.log

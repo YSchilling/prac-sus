@@ -1,0 +1,16 @@
+snapshot,node,job,tuning,perf,role,note
+stress-1008,sut-01,*,default,no,course,course snapshot; tuning inferred from its power curve (lab-1117-cleanroom)
+stress-1008,sut-02,*,clean-room,no,course,course snapshot; tuning inferred from its power curve (lab-1117-cleanroom)
+teastore-1008,sut-01,*,default,no,course,course snapshot; tuning inferred from its power curve (lab-1117-cleanroom)
+teastore-1008,sut-02,*,clean-room,no,course,course snapshot; tuning inferred from its power curve (lab-1117-cleanroom)
+lab-1115,sut-01,*,default,no,train,cpu + memory x4
+lab-1116,sut-01,*,default,no,test,
+lab-1116-io,sut-01,*,default,no,train,
+lab-1116-io2,sut-01,*,default,no,test,
+lab-1116-sut02,sut-02,*,default,no,test,
+lab-1116-sut02,sut-02,mixed,default,no,locked,new workload
+lab-1117-cleanroom,sut-01,*,clean-room,no,test,
+lab-1117-perf,sut-01,*,default,yes,train,perf collector on
+lab-1117-perf,sut-01,mixed,default,yes,locked,new workload
+lab-1117-sqlite,sut-01,*,default,yes,train,
+lab-1117-sqlite,sut-01,sqlite-app/r2,default,yes,test,round 2 held out

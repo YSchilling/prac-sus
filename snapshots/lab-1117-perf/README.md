@@ -33,8 +33,8 @@ correlation with DRAM power is 0.93, against 0.66 for `awake`.
 ## The model with cache misses
 
 ```text
-package = 20.73 + 29.10 r + 19.14 awake + 1.59 miss_gbps
-dram    =  3.37            +  2.34 awake + 1.38 miss_gbps
+package = 20.85 + 29.21 r + 18.94 awake + 1.59 miss_gbps
+dram    =  3.41            +  2.29 awake + 1.38 miss_gbps
 ```
 
 Node power MAE, package / DRAM, W:
@@ -44,11 +44,13 @@ Node power MAE, package / DRAM, W:
 | `coef.json` | 6.63 / 1.36 | 13.44 / 5.20 | 5.04 / 1.51 | 14.55 / 6.06 |
 | `coef-default-profile.json` (other runs) | 4.55 / 2.92 | 6.49 / 3.80 | 9.07 / 2.74 | 8.60 / 4.83 |
 | CPU-only refit on this run | 4.08 / 2.93 | 5.91 / 3.77 | 3.13 / 1.23 | 7.68 / 4.74 |
-| **`coef-perf.json`** | 3.27 / 0.54 | 4.14 / 0.97 | 3.71 / 1.58 | **4.46 / 1.11** |
+| **`coef-perf.json`** | 3.27 / 0.54 | 4.14 / 0.97 | 3.71 / 1.58 | **4.49 / 1.11** |
 
-cpu/memory/io are training data for the last two rows. On mixed,
-`tools/score.py` gives the same 4.46 / 1.10 W, with total energy off by
-+1.7 % / +2.7 % (CPU-only: −10.7 % / −33.6 %). In the memory-streaming
+cpu/memory/io are training data for the last two rows (the table is from the
+first fit; `train.py --select` refits it from 307 instead of 310 steps, which
+moves no weight by more than 0.2). On mixed, `tools/lab_eval.py` gives
+4.49 / 1.11 W, with total energy off by
++1.7 % / +2.8 % (CPU-only: −10.7 % / −33.6 %). In the memory-streaming
 phases DRAM is now right (15.0 predicted vs. 15.2 measured; CPU-only 9.1).
 
 ## Caveats
