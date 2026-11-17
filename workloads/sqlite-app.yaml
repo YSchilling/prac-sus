@@ -14,9 +14,9 @@
 # Single-threaded: expect about one busy hardware thread, plus fsync waits in
 # update/import (WAL, synchronous=FULL).
 #
-# The image is not in any registry. Build it and load it into the SUT node's
-# containerd before applying (README "Run in the lab"); imagePullPolicy Never
-# makes a missing image fail fast instead of pulling.
+# The image comes from the lab's private registry, registry.lab:5010. Build,
+# tag and push it from a lab host before applying (README "Run in the lab").
+# Bump the tag for every change: IfNotPresent keeps a cached copy of a tag.
 #
 #   kubectl apply -f workloads/sqlite-app.yaml
 #   kubectl logs -f job/sqlite-app
@@ -51,8 +51,8 @@ spec:
             sizeLimit: 4Gi
       containers:
         - name: sqlite-app
-          image: sqlite-app:dev
-          imagePullPolicy: Never
+          image: registry.lab:5010/prac-sus/sqlite-app:v1
+          imagePullPolicy: IfNotPresent
           args: ["/data/sqlite-app"]
           env:
             - name: PROFILE

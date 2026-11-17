@@ -191,34 +191,45 @@ python3 workloads/sqlite-app/app.py report --db "$d/data/base.db" --duration 10 
 Container (no network, read-only root, a task-owned name):
 
 ```sh
-docker build -t sqlite-app:dev workloads/sqlite-app
+docker build -t sqlite-app:v1 workloads/sqlite-app
 docker run --rm --network none --read-only --user "$(id -u):$(id -g)" \
-  -e PROFILE=smoke -e TMPDIR=/data -v "$d:/data" sqlite-app:dev
+  -e PROFILE=smoke -e TMPDIR=/data -v "$d:/data" sqlite-app:v1
 ```
 
 ## Run in the lab
 
-The image is not in any registry. The Job uses `image: sqlite-app:dev` with
-`imagePullPolicy: Never`, so the image must already be in the containerd
-image store (`k8s.io` namespace) of the SUT node that runs it. Otherwise the
-pod fails with `ErrImageNeverPull`. One way, for each SUT you book:
+The Job pulls `registry.lab:5010/prac-sus/sqlite-app:v1` from the lab's
+private registry (`imagePullPolicy: IfNotPresent`). Push the image once from a
+lab host that has Docker and reaches `registry.lab` (for example `cp-01`);
+every SUT then pulls it itself. If the lab host can build (it needs to pull
+`python:3.13-slim` from Docker Hub):
 
 ```sh
-docker build -t sqlite-app:dev workloads/sqlite-app        # x86_64, like the SUTs
-docker save sqlite-app:dev -o sqlite-app.tar
-scp sqlite-app.tar <sut-node>:
-ssh <sut-node> 'sudo ctr -n k8s.io images import sqlite-app.tar && sudo ctr -n k8s.io images ls | grep sqlite-app'
+docker build -t sqlite-app:v1 prac-sus/workloads/sqlite-app      # x86_64, like the SUTs
+docker tag sqlite-app:v1 registry.lab:5010/prac-sus/sqlite-app:v1
+docker push registry.lab:5010/prac-sus/sqlite-app:v1
+curl -s http://registry.lab:5010/v2/prac-sus/sqlite-app/tags/list   # expect "v1"
 ```
 
-This needs SSH and root (or containerd socket) access on the SUT node.
-Nobody has verified that a lab booking grants either. If it does not, ask
-the lab staff how to load a local image, and do not push it to a public
-registry. Then, on the cp node:
+If it cannot reach Docker Hub, build elsewhere and carry the image over:
+`docker save sqlite-app:v1 -o sqlite-app.tar`, `scp` it to the lab host, then
+`docker load -i sqlite-app.tar` there before the tag and push.
+
+Tags are cached on the nodes. After any change to the image, push a new tag
+(`v2`, ...) and update `image:` in `workloads/sqlite-app.yaml`; re-pushing
+`v1` would leave nodes that already pulled it on the old image. Then, on the
+cp node:
 
 ```sh
 kubectl apply -f prac-sus/workloads/sqlite-app.yaml        # or via lab_repeat.sh
 kubectl logs -f job/sqlite-app
 ```
+
+If the pod sits in `ErrImagePull` or `ImagePullBackOff`, run
+`kubectl describe pod -l app=sqlite-app`: a wrong name or tag shows
+`not found`, an HTTP/HTTPS mismatch shows `http: server gave HTTP response to
+HTTPS client` (the node's containerd is not configured for the registry; ask
+the lab staff).
 
 Run it alone, not next to the other Jobs. The Job asks for 1 CPU and 1 GiB
 (limit 2 GiB; no CPU limit, which would throttle) and a 4 GiB disk-backed
