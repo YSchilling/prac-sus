@@ -1,0 +1,83 @@
+# SQLite shop application on the measured SUT: one Python process, one
+# connection per phase. See workloads/sqlite-app/README.md.
+#
+#   prepare (unmarked)   generate and load the medium dataset, build indexes, verify
+#   idle                 90 s
+#   warmup               60 s   search, then report, on base.db (page cache warm, not cold)
+#   search rate=1000/5000/max          90 s each   indexed point and range lookups
+#   report rate=1/3/max                90 s each   joins, grouping, sorting over sales
+#   restore, update rate=50/200/max, verify        90 s each, each on a fresh copy
+#   restore, import batch=1/100, verify            60 s each, each on a fresh copy
+#   idle                 90 s
+# About 25 minutes with preparation (39 s for medium on free-dev). Rates are
+# operation caps; the logs report achieved ops/s, latency and errors per phase.
+# Single-threaded: expect about one busy hardware thread, plus fsync waits in
+# update/import (WAL, synchronous=FULL).
+#
+# The image is not in any registry. Build it and load it into the SUT node's
+# containerd before applying (README "Run in the lab"); imagePullPolicy Never
+# makes a missing image fail fast instead of pulling.
+#
+#   kubectl apply -f workloads/sqlite-app.yaml
+#   kubectl logs -f job/sqlite-app
+#
+# UTC marks work with tools/lab_windows.py and tools/lab_repeat.sh. No network
+# service is exposed. Disk-backed emptyDir on the SUT's kubelet storage;
+# ext4/XFS required. Run separately from the other Jobs.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sqlite-app
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 2100
+  template:
+    metadata:
+      labels:
+        app: sqlite-app
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      nodeSelector:
+        role: sut
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+      volumes:
+        - name: data
+          emptyDir:
+            sizeLimit: 4Gi
+      containers:
+        - name: sqlite-app
+          image: sqlite-app:dev
+          imagePullPolicy: Never
+          args: ["/data/sqlite-app"]
+          env:
+            - name: PROFILE
+              value: full
+            - name: PRESET
+              value: medium
+            - name: SEED
+              value: "42"
+            - name: REQUIRE_DISK_FS
+              value: "1"
+            - name: TMPDIR
+              value: /data
+          resources:
+            requests:
+              cpu: "1"
+              memory: 1Gi
+              ephemeral-storage: 4Gi
+            limits:
+              memory: 2Gi
+              ephemeral-storage: 6Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
